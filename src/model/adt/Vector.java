@@ -1,7 +1,11 @@
 package model.adt;
 
-public class Vector<T> extends java.util.Vector {
+public class Vector<T> {
+    private Vector<T> elems;
     public Vector(int init) {
-        super(init);
+        elems = new Vector<>(init);
+    }
+    public void add(T elem) {
+        elems.add(elem);
     }
 }

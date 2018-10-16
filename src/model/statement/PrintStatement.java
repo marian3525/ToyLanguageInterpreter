@@ -6,7 +6,8 @@ import model.expression.Expression;
 import model.programState.ProgramState;
 
 public class PrintStatement implements Statement {
-    Expression expression;
+    private Expression expression;
+    public static final String printRegex = "";
 
     public PrintStatement(Expression expression) {
         this.expression = expression;

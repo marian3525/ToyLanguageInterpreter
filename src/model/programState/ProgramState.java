@@ -1,5 +1,8 @@
 package model.programState;
 
+import model.interfaces.ExecutionStack;
+import model.interfaces.Output;
+import model.interfaces.SymbolTable;
 import model.statement.Statement;
 
 import java.util.*;

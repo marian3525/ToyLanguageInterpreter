@@ -10,8 +10,9 @@ import java.util.Map;
 import java.util.Stack;
 
 public class AssignmentStatement implements Statement {
-    String id;
-    Expression expression;
+    private String id;
+    private Expression expression;
+    public static final String assignmentRegex= "^[a-zA-Z_]+[a-zA-Z0-9_]*=[+-]?([0]{1}$|[1-9][0-9]*$)";
 
     public AssignmentStatement(String id, Expression expression) {
         this.id = id;

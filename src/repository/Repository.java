@@ -1,6 +1,7 @@
 package repository;
 
 import exceptions.ProgramException;
+import exceptions.RepositoryException;
 import model.programState.ProgramState;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,9 +17,9 @@ public class Repository {
         progs = new HashMap<>();
     }
 
-    public void addProgram(String progName, ProgramState programState)  throws ProgramException {
+    public void addProgram(String progName, ProgramState programState) throws RepositoryException {
         if(progs.containsKey(progName)) {
-            throw new ProgramException("Program " + progName + " already exists!");
+            throw new RepositoryException("Program " + progName + " already exists!");
         }
         else {
             progs.put(progName, programState);

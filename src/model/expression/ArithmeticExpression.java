@@ -5,7 +5,7 @@ import exceptions.UndefinedVariableException;
 
 import java.util.Map;
 
-public class ArithmeticExpression implements Expression {
+public class ArithmeticExpression extends Expression{
     private Expression first;
     private Expression second;
     private String op;
@@ -17,11 +17,16 @@ public class ArithmeticExpression implements Expression {
     }
 
     @Override
+    public String toString() {
+        return (first.toString() + op + second.toString());
+    }
+
+    @Override
     public int evaluate(Map<String, Integer> symbols) throws UndefinedOperationException, UndefinedVariableException {
         switch(op) {
             case "+": return first.evaluate(symbols) + second.evaluate(symbols);
             case "-": return first.evaluate(symbols) - second.evaluate(symbols);
-            case "/": return first.evaluate(symbols) / second.evaluate(symbols);    //TODO throw ArithmeticException if the second is 0
+            case "/": return first.evaluate(symbols) / second.evaluate(symbols);    //TODO throw ArithmeticException if the second is 0z
             case "*": return first.evaluate(symbols) * second.evaluate(symbols);
         }
         //if it hasn't returned, the op isn't supported, throw an error

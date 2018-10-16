@@ -9,6 +9,7 @@ public class IfStatement implements Statement {
     private Expression condition;
     private Statement thenStatement;
     private Statement elseStatement;
+    public static final String ifRegex = "";
 
     public IfStatement(Expression condition, Statement thenStatement, Statement elseStatement) {
         this.condition = condition;

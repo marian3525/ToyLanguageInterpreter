@@ -5,11 +5,17 @@ import model.expression.Expression;
 
 import java.util.Map;
 
-public class VariableExpression implements Expression {
+public class VariableExpression extends Expression {
     private String id;
+    public static final String variableRegex = "^([a-zA-Z_]+[a-zA-Z0-9_]*)";
 
     public VariableExpression(String id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return id;
     }
 
     @Override
@@ -17,6 +23,6 @@ public class VariableExpression implements Expression {
         if(symbols.containsKey(id))
             return symbols.get(id);
         else
-            throw new UndefinedVariableException("Variable " +  id + "not defined.");
+            throw new UndefinedVariableException("Variable " +  id + " not defined.");
     }
 }

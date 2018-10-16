@@ -5,6 +5,12 @@ import model.programState.ProgramState;
 public class CompoundStatement implements Statement {
     private Statement first;
     private Statement second;
+    public static final String compundRegex = "";       //not used at the moment
+
+    public CompoundStatement(Statement first, Statement second) {
+        this.first = first;
+        this.second = second;
+    }
 
     @Override
     public ProgramState execute(ProgramState programState) {
