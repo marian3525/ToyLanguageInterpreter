@@ -2,12 +2,13 @@ package model.statement;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.adt.Stack;
 import model.expression.Expression;
 import model.programState.ProgramState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
-import java.util.Stack;
+
 
 public class AssignmentStatement implements Statement {
     private String id;

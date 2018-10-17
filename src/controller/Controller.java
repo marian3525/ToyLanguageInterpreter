@@ -1,6 +1,8 @@
 package controller;
 
 import exceptions.*;
+import model.adt.Stack;
+import model.adt.Vector;
 import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
 import model.expression.Expression;
@@ -12,8 +14,6 @@ import repository.Repository;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Stack;
-import java.util.Vector;
 
 public class Controller {
     Repository repo;
@@ -45,7 +45,7 @@ public class Controller {
      */
     public void run(String progName) throws ProgramException, UndefinedVariableException, UndefinedOperationException {
         ProgramState state = repo.getProgramByName(progName);
-        while(! state.getExecutionStack().empty()) {
+        while (!state.getExecutionStack().isEmpty()) {
             Statement top = state.getExecutionStack().pop();
             top.execute(state);
         }
@@ -304,10 +304,12 @@ public class Controller {
 
     @SuppressWarnings("unchecked")
     public Vector<String> getStackString(String progName) throws ProgramException {
-        Stack<Statement> s = (Stack<Statement>) repo.getProgramByName(progName).getExecutionStack().clone();
+        //Stack<Statement> s = (Stack<Statement>) repo.getProgramByName(progName).getExecutionStack().clone(); //for java.util
+        Stack<Statement> s = repo.getProgramByName(progName).getExecutionStack().clone();
+
         Vector<String> v = new Vector<>(10);
 
-        while(!s.empty()) {
+        while (!s.isEmpty()) {
             v.add(s.pop().toString());
         }
         return v;

@@ -1,11 +1,12 @@
 package model.programState;
 
-import model.interfaces.ExecutionStack;
-import model.interfaces.Output;
-import model.interfaces.SymbolTable;
+
+import model.adt.HashMap;
+import model.adt.Stack;
+import model.adt.Vector;
 import model.statement.Statement;
 
-import java.util.*;
+import java.util.Map;
 
 public class ProgramState {
     private Stack<Statement> executionStack;
@@ -14,7 +15,7 @@ public class ProgramState {
 
     public ProgramState() {
         executionStack = new Stack<>();
-        symbols = new HashMap<>();
+        symbols = new HashMap<String, Integer>();
         output = new Vector<>(10);
     }
 

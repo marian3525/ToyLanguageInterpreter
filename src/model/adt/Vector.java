@@ -1,11 +1,34 @@
 package model.adt;
 
-public class Vector<T> {
-    private Vector<T> elems;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
+
+public class Vector<T> implements Iterable<T> {
+    private java.util.Vector<T> elems;
     public Vector(int init) {
-        elems = new Vector<>(init);
+        elems = new java.util.Vector<>(init);
     }
     public void add(T elem) {
         elems.add(elem);
+    }
+
+    public int size() {
+        return elems.size();
+    }
+
+    public T elementAt(int i) {
+        return elems.elementAt(i);
+    }
+
+    @SuppressWarnings("unchecked")
+    public T[] toArray() {
+        return (T[]) elems.toArray();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<T> iterator() {
+        return elems.iterator();
     }
 }

@@ -11,10 +11,22 @@ public class Stack<T> {
     public T push(T elem) {
         return stack.push(elem);
     }
-    public boolean empty() {
+
+    public boolean isEmpty() {
         return stack.empty();
     }
     public T peek() {
         return stack.peek();
+    }
+
+    public Stack<T> clone() {
+        /*
+        1 2 3 4   4 3 2 1
+         */
+        Stack<T> out = new Stack<>();
+        for (T e : stack) {
+            out.push(e);
+        }
+        return out;
     }
 }

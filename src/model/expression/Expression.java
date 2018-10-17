@@ -3,10 +3,11 @@ package model.expression;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.adt.Stack;
+import model.adt.Vector;
 
 import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+
 
 public abstract class Expression {
 
@@ -21,7 +22,7 @@ public abstract class Expression {
      * @return Vector containing the variables, constants and operators from the input string
      */
     public static Vector<String> tokenize(String in) {
-        Vector<String> out = new Vector<>();
+        Vector<String> out = new Vector<>(10);
         StringBuilder nameBuilder = new StringBuilder();
         StringBuilder valueBuilder = new StringBuilder();
 

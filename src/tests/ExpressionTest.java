@@ -2,12 +2,11 @@ package tests;
 
 
 import exceptions.SyntaxException;
+import model.adt.Vector;
 import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
 import model.expression.Expression;
 import org.junit.Test;
-
-import java.util.Vector;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -16,7 +15,7 @@ public class ExpressionTest {
     @Test
     public void testTokenize() {
         String expr = "a+(b-21+44*v3)";
-        Vector<String> expected = new Vector<>();
+        Vector<String> expected = new Vector<>(10);
         expected.add("a");
         expected.add("+");
         expected.add("(");
@@ -65,7 +64,7 @@ public class ExpressionTest {
 
     @Test
     public void buildExpressionFromPostfix() {
-        Vector<String> postfix1 = new Vector<String>();
+        Vector<String> postfix1 = new Vector<String>(10);
         postfix1.add("2");
         postfix1.add("3");
         postfix1.add("4");

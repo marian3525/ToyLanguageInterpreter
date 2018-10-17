@@ -107,7 +107,7 @@ public class UI {
         String programName1 = "program1";
         String programName2 = "program2";
 
-        String[] program1 = {"if a then print(b) else print(101+b);", "a=0", "b=10"};
+        String[] program1 = {"if a then print(b) else print(101+b*10/10-1);", "a=0", "b=10"};
 
         controller.addEmptyProgram(programName1);
         try {
