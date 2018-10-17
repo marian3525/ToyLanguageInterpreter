@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class ConstantExpression extends Expression {
     private int value;
-    public static final String constantRegex = "^[-+]?[1-9]\\d*$";
+    public static final String constantRegex = "^[-+]?([0]{1})|([1-9]\\d*$)";
     public ConstantExpression(int value) {
         this.value = value;
     }

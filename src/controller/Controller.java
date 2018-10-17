@@ -7,7 +7,6 @@ import model.expression.Expression;
 import model.expression.VariableExpression;
 import model.programState.ProgramState;
 import model.statement.*;
-import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import repository.Repository;
 
@@ -20,15 +19,30 @@ public class Controller {
     Repository repo;
 
     public Controller() {
-        repo = Repository.makeRepository();
+        repo = new Repository();
     }
 
+    /**
+     * The execution will continue with the last instruction on top of the execution stack each time
+     * step() is called
+     * @param progName: the name of the program to be run. The program must exist in memory
+     * @throws ProgramException if the specified can't be run because it doesn't exist
+     * @throws UndefinedOperationException  if an operation without definition is encountered
+     * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
+     */
     public void step(String progName) throws ProgramException, UndefinedOperationException, UndefinedVariableException {
          ProgramState state = repo.getProgramByName(progName);
          Statement top = state.getExecutionStack().pop();
          top.execute(state);
     }
 
+    /**
+     * Run all the instructions in the current program
+     * @param progName the name of the program to be run
+     * @throws ProgramException if the specified can't be run because it doesn't exist
+     * @throws UndefinedOperationException  if an operation without definition is encountered
+     * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
+     */
     public void run(String progName) throws ProgramException, UndefinedVariableException, UndefinedOperationException {
         ProgramState state = repo.getProgramByName(progName);
         while(! state.getExecutionStack().empty()) {
@@ -38,14 +52,10 @@ public class Controller {
 
     }
 
-    public int execute(String input) throws UndefinedVariableException, UndefinedOperationException {
-        AssignmentStatement a = new AssignmentStatement("a",
-                new ArithmeticExpression(new ConstantExpression(3), new ConstantExpression(2), "+"));
-        ProgramState p = new ProgramState();
-        p = a.execute(p);
-        return p.getSymbols().get("a");
-    }
-
+    /**
+     * Create a new program which can receive and execute instructions
+     * @param progName Name of the program to be created and added into the repo
+     */
     public void addEmptyProgram(String progName) {
         ProgramState state = new ProgramState();
         try {
@@ -54,47 +64,34 @@ public class Controller {
             e.printStackTrace();
         }
     }
-    /**
-     * Split the input string in its components separated with space used as separator
-     */
-    public Vector<String> tokenize(String input) {
-
-        Vector<String> tokens = new Vector<>(10);
-        String[] auxTok = input.split("[-+*/|\\s*]");
-
-        for(String t : auxTok) {
-            if(!t.contains(" "))
-                tokens.add(t);
-        }
-        return tokens;
-    }
 
     /**
-     *
+     *  Used to decide on the type of a statement based on its semantics
      * @param statementStr: statement as string
      * @return Assignment/Compound/If/Print depending on the statement type
      */
     private String getStatementType(@NotNull String statementStr) {
-        if(statementStr.matches(AssignmentStatement.assignmentRegex)) { //TODO assignments like a=2+b don't fit here
+
+        String[] aux = statementStr.split("=");
+        if(aux.length == 2 && !statementStr.contains(";"))
             return "AssignmentStatement";
+
+        aux = statementStr.split(";");
+        if(aux.length >= 2) {
+            return "CompoundStatement";
         }
-        else{
-            String[] aux = statementStr.split(";");
-                if(aux.length == 2) {
-                    return "CompoundStatement";
-            }
-        }
-        if(statementStr.matches(IfStatement.ifRegex)) {
+        if(statementStr.contains("if") && statementStr.contains("then") && statementStr.contains("else")) {
             return "IfStatement";
         }
-        else if(statementStr.matches(PrintStatement.printRegex)) {
+        else if(statementStr.contains("print(") && statementStr.endsWith(")")) {
             return "PrintStatement";
         }
         return null;
     }
 
     /**
-     * @param expression: expression whose type need to be identified
+     * Find the type of expression which fits the given semantics
+     * @param expression: expression whose type needs to be identified
      * @return: the type of expression as class
      */
     @NotNull
@@ -110,6 +107,12 @@ public class Controller {
         }
     }
 
+    /**
+     *
+     * @param input a compound statement given as a string, e.g. a=2+3;b=1
+     * @return  An instance of CompoundStatement created by parsing the given string
+     * @throws SyntaxException  if the input string doesn't have valid CompoundStatement syntax
+     */
     private CompoundStatement getCompoundStatementFromString(String input) throws SyntaxException {
         //? separator by ';'?
         //a=2;b=2*a+5 OR a=b;b=3 OR a=c*3;b=c*4; OR a=a+1;print(a)
@@ -119,7 +122,7 @@ public class Controller {
         //should result in 2 strings
         String first = sides[0];
         String second = sides[1];
-
+        //TODO null in secondType on simple compound like a=1;b=a+1
         String firstType = getStatementType(first);
         String secondType = getStatementType(second);
 
@@ -133,6 +136,13 @@ public class Controller {
         return s;
     }
 
+    /**
+     *
+     * @param statement String representation of the statement, assumed to be syntactically valid
+     * @param statementType The type of statement, Assignment, Compound, If, Print...
+     * @return  A Statement built from the given string
+     * @throws SyntaxException if the input string is has syntactic errors
+     */
     private Statement getStatementFromType(String statement, String statementType) throws SyntaxException {
         switch (statementType) {
             case "AssignmentStatement":
@@ -147,6 +157,13 @@ public class Controller {
         return null;
     }
 
+    /**
+     *
+     * @param expressionStr string representation of an expression
+     * @param expressionType type of expression: (constant, variable or arithmetic)
+     * @return  An Expression built from the given string
+     * @throws SyntaxException  if there are syntax errors in the input string
+     */
     private Expression getExpressionFromType(String expressionStr, String expressionType) throws SyntaxException {
         switch(expressionType) {
             case "ConstantExpression":
@@ -155,13 +172,19 @@ public class Controller {
                 String varName = expressionStr.split("=")[0];
                 return new VariableExpression(varName);
             case "ArithmeticExpression":
-                String rhs = expressionStr.split("=")[1];
+                String rhs = expressionStr;//.split("=")[1];       //crash on print(a+1)
                 Vector<String> postfix = Expression.infixToPostfix(rhs);
                 return Expression.buildExpressionFromPostfix(postfix);
         }
         return null;
     }
 
+    /**
+     *
+     * @param input string representation of a print statement
+     * @return  A PrintStatement build from the input string
+     * @throws SyntaxException if the input string is not syntactically valid
+     */
     private PrintStatement getPrintStatementFromString(String input) throws SyntaxException {
         //depending on the parameter, treat each case
         //syntax: print(a) OR print(a+2*b) OR print(2)
@@ -169,7 +192,7 @@ public class Controller {
         //extract the expression string
         Expression expr=null;
 
-        String param = input.replace("print(", "").replace(")", "");
+        String param = input.replace("print(", "").replace(")", "").replace(";", "");
 
         //figure out what kind of expression param is:
         expr = getExpressionFromType(param, getExpressionType(param));
@@ -177,6 +200,13 @@ public class Controller {
         PrintStatement s = new PrintStatement(expr);
         return s;
     }
+
+    /**
+     *
+     * @param input: String repr. of an assignment, e.g. "a=2+3" or "a=2*b+8*c"
+     * @return  A AssignmentStatement built from the string
+     * @throws SyntaxException
+     */
     private AssignmentStatement getAssignmentStatementFromString(String input) throws SyntaxException {
         //then it has the syntax: var_name=const_value OR var_name = another_var OR var_name = arith_expr
         //remove the ';' and split by '='
@@ -187,7 +217,7 @@ public class Controller {
         //depending whether the rhs is a const, var or arith_expr
 
         switch (getExpressionType(sides[1])) {
-            case "ConstantExpression":
+            case "ConstantExpression":  //b=0 doesn't match
                 int value = Integer.parseInt(sides[1]);
                 s = new AssignmentStatement(varName, new ConstantExpression(value));
                 break;
@@ -228,11 +258,11 @@ public class Controller {
         // elseStatement at 5
         conditionType = getExpressionType(tokens[1]);
         thenStatementType = getStatementType(tokens[3]);
-        elseStatementType = getStatementType(tokens[5]);
+        elseStatementType = getStatementType(tokens[5].replace(";", ""));   //
 
         condition = getExpressionFromType(tokens[1], conditionType);
-        thenStatement = getStatementFromType(tokens[3], thenStatementType);
-        elseStatement = getStatementFromType(tokens[5], elseStatementType);
+        thenStatement = getStatementFromType(tokens[3], Objects.requireNonNull(thenStatementType));
+        elseStatement = getStatementFromType(tokens[5], Objects.requireNonNull(elseStatementType));
 
         IfStatement ifStatement = new IfStatement(condition, thenStatement, elseStatement);
         return ifStatement;
@@ -254,7 +284,7 @@ public class Controller {
         Statement s = null;
         if(input == null || progName == null)
             return;
-        switch (getStatementType(input)) {
+        switch (Objects.requireNonNull(getStatementType(input))) {
             case "AssignmentStatement":
                 s = getAssignmentStatementFromString(input);
                 break;
@@ -272,6 +302,7 @@ public class Controller {
         repo.getProgramByName(progName).getExecutionStack().push(s);
     }
 
+    @SuppressWarnings("unchecked")
     public Vector<String> getStackString(String progName) throws ProgramException {
         Stack<Statement> s = (Stack<Statement>) repo.getProgramByName(progName).getExecutionStack().clone();
         Vector<String> v = new Vector<>(10);

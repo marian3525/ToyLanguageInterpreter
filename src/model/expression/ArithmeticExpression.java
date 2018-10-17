@@ -18,7 +18,21 @@ public class ArithmeticExpression extends Expression{
 
     @Override
     public String toString() {
-        return (first.toString() + op + second.toString());
+        String firstStr="";
+        String secondStr="";
+
+        if(first instanceof ArithmeticExpression)
+            //put the expression in ()
+            firstStr = "(" + first.toString() + ")";
+        else    //no () for constants or variables
+            firstStr = first.toString();
+
+        if(second instanceof ArithmeticExpression)
+            secondStr = "(" + second.toString() + ")";
+        else
+            secondStr = second.toString();
+
+        return firstStr + op + secondStr;
     }
 
     @Override

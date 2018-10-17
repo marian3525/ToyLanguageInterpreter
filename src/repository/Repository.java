@@ -3,7 +3,6 @@ package repository;
 import exceptions.ProgramException;
 import exceptions.RepositoryException;
 import model.programState.ProgramState;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,7 @@ public class Repository {
     private Map<String, ProgramState> progs;
     private static boolean isCreated = false;
 
-    private Repository() {
+    public Repository() {
         progs = new HashMap<>();
     }
 
@@ -32,17 +31,6 @@ public class Repository {
         }
         else {
             throw new ProgramException("Program with name: " + progName + " does not exist");
-        }
-    }
-
-    @Nullable
-    public static Repository makeRepository() {
-        if(isCreated) {
-            return null;
-        }
-        else {
-            isCreated = true;
-            return new Repository();
         }
     }
 }

@@ -5,8 +5,6 @@ import exceptions.ProgramException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import model.expression.Expression;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Scanner;
 
@@ -32,8 +30,9 @@ public class UI {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
+
     private void showHelp() {
-        String help="";
+        String help = "";
         help += "Usage:" +
                 "\n1. add <car/moto/truck> <repairPrice> <id> | Add a new entry with the specified attributes" +
                 "\n2. remove <id> | remove the entry with the given id" +
@@ -49,7 +48,7 @@ public class UI {
             controller.addStatementString(input, progName);
             input = readFromConsole(progName + "::");
         }
-        while(input.contains(";"));
+        while (input.contains(";"));
         controller.addStatementString(input, progName);
     }
 
@@ -66,29 +65,26 @@ public class UI {
         progName = input;
         controller.addEmptyProgram(progName);
 
-        while(!quitting) {
-            if(input.equals("quit")) {
+        while (!quitting) {
+            if (input.equals("quit")) {
                 quitting = true;
             }
 
-            if(input.equals("step")) {
+            if (input.equals("step")) {
                 try {
                     controller.step(progName);
-                }
-                catch (UndefinedVariableException undefVarException) {
+                } catch (UndefinedVariableException undefVarException) {
                     System.out.println(undefVarException.getMessage());
                     //undefVarException.printStackTrace();
-                }
-                catch (UndefinedOperationException undefOpException) {
+                } catch (UndefinedOperationException undefOpException) {
                     System.out.println(undefOpException.getMessage());
                     //undefOpException.printStackTrace();
-                }
-                catch(ProgramException progException) {
+                } catch (ProgramException progException) {
                     System.out.println(progException.getMessage());
                     //progException.printStackTrace();
                 }
             }
-            if(input.equals("run")) {
+            if (input.equals("run")) {
                 try {
                     controller.run(progName);
                 } catch (UndefinedVariableException e) {
@@ -106,24 +102,25 @@ public class UI {
 
         }
     }
+
     private void debug() throws ProgramException, UndefinedVariableException, UndefinedOperationException {
         String programName1 = "program1";
         String programName2 = "program2";
 
-        String[] program1 = {"a=1;a=3"};
+        String[] program1 = {"if a then print(b) else print(101+b);", "a=0", "b=10"};
 
         controller.addEmptyProgram(programName1);
         try {
-            for(String instruction : program1)
+            for (String instruction : program1)
                 controller.addStatementString(instruction, programName1);
 
             System.out.println("Stack:");
-            for(String s : controller.getStackString(programName1)) {
+            for (String s : controller.getStackString(programName1)) {
                 System.out.println(s);
             }
             System.out.println("\nSymbols:");
 
-            for(String key : controller.getSymbols(programName1).keySet()) {
+            for (String key : controller.getSymbols(programName1).keySet()) {
                 System.out.println("VarName: " + key + ": " + controller.getSymbols(programName1).get(key));
             }
         } catch (SyntaxException e) {
@@ -136,20 +133,24 @@ public class UI {
             e.printStackTrace();
         }
 
-        while(controller.getStackString(programName1).size()!=0) {
+        while (controller.getStackString(programName1).size() != 0) {
 
-            readFromConsole("");
+            //readFromConsole("");
 
-            controller.step(programName1);
+            controller.run(programName1);
 
             System.out.println("Stack:");
-            for(String s : controller.getStackString(programName1)) {
+            for (String s : controller.getStackString(programName1)) {
                 System.out.println(s);
             }
             System.out.println("\nSymbols:");
 
-            for(String key : controller.getSymbols(programName1).keySet()) {
+            for (String key : controller.getSymbols(programName1).keySet()) {
                 System.out.println("VarName: " + key + ": " + controller.getSymbols(programName1).get(key));
+            }
+            System.out.println("\nOutput:");
+            for (String o : controller.getOutput(programName1)) {
+                System.out.println(o);
             }
         }
     }
