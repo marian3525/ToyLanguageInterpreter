@@ -5,7 +5,7 @@ import exceptions.UndefinedVariableException;
 import model.expression.Expression;
 import model.programState.ProgramState;
 
-public class IfStatement implements Statement {
+public class IfStatement extends Statement {
     private Expression condition;
     private Statement thenStatement;
     private Statement elseStatement;

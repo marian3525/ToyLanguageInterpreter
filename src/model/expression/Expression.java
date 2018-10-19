@@ -6,6 +6,7 @@ import exceptions.UndefinedVariableException;
 import model.adt.Stack;
 import model.adt.Vector;
 
+import java.util.EmptyStackException;
 import java.util.Map;
 
 
@@ -146,10 +147,15 @@ public abstract class Expression {
                 stack.push(exp);
             } else {
                 //if it is an operator, pop 2 from the stack, create a new expression using the operator
-                //and push it back to the stack
-
-                Expression second = stack.pop();
-                Expression first = stack.pop();
+                //and push it back to the stack7
+                Expression second = null;
+                Expression first = null;
+                try {
+                    second = stack.pop();
+                    first = stack.pop();
+                } catch (EmptyStackException e) {
+                    //throw new ProgramException("Error parsing expressin");
+                }
                 Expression combined = new ArithmeticExpression(first, second, tok);
                 stack.push(combined);
             }

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 
-public class AssignmentStatement implements Statement {
+public class AssignmentStatement extends Statement {
     private String id;
     private Expression expression;
     public static final String assignmentRegex= "^[a-zA-Z_]+[a-zA-Z0-9_]*=[+-]?([0]{1}$|[1-9][0-9]*$)";

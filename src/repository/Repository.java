@@ -1,13 +1,12 @@
 package repository;
 
-import exceptions.ProgramException;
 import exceptions.RepositoryException;
 import model.programState.ProgramState;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Repository {
+public class Repository implements RepositoryInterface {
     //vector of running programs
     private Map<String, ProgramState> progs;
     private static boolean isCreated = false;
@@ -25,12 +24,12 @@ public class Repository {
         }
     }
 
-    public ProgramState getProgramByName(String progName) throws ProgramException {
+    public ProgramState getProgramByName(String progName) throws RepositoryException {
         if(progs.containsKey(progName)) {
             return progs.get(progName);
         }
         else {
-            throw new ProgramException("Program with name: " + progName + " does not exist");
+            throw new RepositoryException("Program with name: " + progName + " does not exist");
         }
     }
 }

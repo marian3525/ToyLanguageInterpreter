@@ -1,6 +1,7 @@
 package tests;
 
 
+import exceptions.ProgramException;
 import exceptions.SyntaxException;
 import model.adt.Vector;
 import model.expression.ArithmeticExpression;
@@ -63,7 +64,7 @@ public class ExpressionTest {
     }
 
     @Test
-    public void buildExpressionFromPostfix() {
+    public void buildExpressionFromPostfix() throws ProgramException, SyntaxException {
         Vector<String> postfix1 = new Vector<String>(10);
         postfix1.add("2");
         postfix1.add("3");
@@ -71,13 +72,12 @@ public class ExpressionTest {
         postfix1.add("*");
         postfix1.add("+");
         Vector<String> postfix2=null;
-        try {
-            postfix2 = Expression.infixToPostfix("2+(3+2*8)/2");
-        } catch (SyntaxException e) {
-            e.printStackTrace();
-        }
+        postfix2 = Expression.infixToPostfix("2+(3+2*8)/2");
+
         Expression e1 = Expression.buildExpressionFromPostfix(postfix1);
-        Expression e2 = Expression.buildExpressionFromPostfix(postfix2);
+        Expression e2;
+        e2 = Expression.buildExpressionFromPostfix(postfix2);
+
 
         Expression e1ShouldBe = new ArithmeticExpression(new ConstantExpression(2), new ArithmeticExpression
                 (new ConstantExpression(3), new ConstantExpression(4), "*"), "+");

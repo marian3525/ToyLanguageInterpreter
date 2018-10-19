@@ -2,10 +2,9 @@ package model.statement;
 
 import model.programState.ProgramState;
 
-public class CompoundStatement implements Statement {
+public class CompoundStatement extends Statement {
     private Statement first;
     private Statement second;
-    public static final String compundRegex = "";       //not used at the moment
 
     public CompoundStatement(Statement first, Statement second) {
         this.first = first;

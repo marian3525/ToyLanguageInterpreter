@@ -1,7 +1,7 @@
 package view;
 
 import controller.Controller;
-import exceptions.ProgramException;
+import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
@@ -13,16 +13,7 @@ public class UI {
 
     public UI() {
         controller = new Controller();
-        try {
-            debug();
-        } catch (ProgramException e) {
-            e.printStackTrace();
-        } catch (UndefinedVariableException e) {
-            e.printStackTrace();
-        } catch (UndefinedOperationException e) {
-            e.printStackTrace();
-        }
-        //runUI();
+        runUI();
     }
 
     private String readFromConsole(String msg) {
@@ -31,127 +22,147 @@ public class UI {
         return scanner.nextLine();
     }
 
-    private void showHelp() {
-        String help = "";
-        help += "Usage:" +
-                "\n1. add <car/moto/truck> <repairPrice> <id> | Add a new entry with the specified attributes" +
-                "\n2. remove <id> | remove the entry with the given id" +
-                "\n3. solve | solve the problem" +
-                "\n4. print | print all entries" +
-                "\n5. quit | exit the app" +
-                "\n6. help";
-        System.out.println(help);
+    private void printHelp() {
+        StringBuilder b = new StringBuilder();
+        b.append("Mini manual: How to use the TPL\n" +
+                "Everything is case sensitive\n" +
+                "Syntax:\n" +
+                "declare a variable: a=1 OR varName=12*7+(1-1) OR a=b (if b is already defined)\n" +
+                "compound statement in one line: a=12+7;b=1+a (the statements will be executed in this order)\n" +
+                "print statement: print(a) OR print(a*9-17*(b+7))\n" +
+                "if statement: if a then print(a) else print(b) (execute then branch if a != 0)");
+        System.out.println(b.toString());
     }
 
-    private void readStatements(String input, String progName) throws SyntaxException, ProgramException, UndefinedVariableException, UndefinedOperationException {
-        do {
-            controller.addStatementString(input, progName);
-            input = readFromConsole(progName + "::");
+    private void printInternals(String progName) {
+        try {
+            System.out.println("Stack:");
+            for (String s : controller.getStackString(progName)) {
+                System.out.println(s);
+            }
+        } catch (RepositoryException e) {
+            System.out.println(e.toString());
         }
-        while (input.contains(";"));
-        controller.addStatementString(input, progName);
+        try {
+            System.out.println("\nSymbols:");
+            for (String key : controller.getSymbols(progName).keySet()) {
+                System.out.println("VarName: " + key + ": " + controller.getSymbols(progName).get(key));
+            }
+        } catch (RepositoryException e) {
+            System.out.println(e.toString());
+        }
+        try {
+            System.out.println("\nOutput:");
+            for (String o : controller.getOutput(progName)) {
+                System.out.println(o);
+            }
+        } catch (RepositoryException e) {
+            System.out.println(e.toString());
+        }
     }
 
     private void runUI() {
-        //main UI loop
-        String progName = "";
         boolean quitting = false;
-        String input;
-        /*
-            Program syntax: progName::=statement1;statement2;
-                            progName::=a=2;
-         */
-        input = readFromConsole("ProgName: ");
-        progName = input;
-        controller.addEmptyProgram(progName);
-
+        String progName = "";
+        boolean printing = false;
+        boolean autorun = false;
         while (!quitting) {
-            if (input.equals("quit")) {
-                quitting = true;
+            String cmd = readFromConsole("(" + progName + ")" + ">");
+            String[] parts = cmd.split(" ");
+            if (cmd.endsWith(" ")) {
+                //cmd = cmd.replace(" ", "");
             }
+            //the first word is the command
+            switch (parts[0]) {
+                case "quit":
+                    quitting = true;
+                    continue;
 
-            if (input.equals("step")) {
-                try {
-                    controller.step(progName);
-                } catch (UndefinedVariableException undefVarException) {
-                    System.out.println(undefVarException.getMessage());
-                    //undefVarException.printStackTrace();
-                } catch (UndefinedOperationException undefOpException) {
-                    System.out.println(undefOpException.getMessage());
-                    //undefOpException.printStackTrace();
-                } catch (ProgramException progException) {
-                    System.out.println(progException.getMessage());
-                    //progException.printStackTrace();
+                case "view":
+                    //toggle printing of the stack, symbols and output
+                    printing = !printing;
+                    System.out.println("Viewing set to " + printing);
+                    continue;
+
+                case "setprog":
+                    //set program name, name should be in parts[1]
+                    if (parts.length > 1)
+                        if (parts[1].length() >= 1) {
+                            progName = parts[1];
+                            try {
+                                controller.addEmptyProgram(progName);
+                            } catch (RepositoryException e) {
+                                //the program with the given name already exists, so it was already created, do nothing
+                            }
+                            continue;
+                        }
+                    System.out.println("Invalid program name");
+                    continue;
+                case "autorun":
+                    //run the input automatically after each input line
+                    autorun = !autorun;
+                    System.out.println("Autorun set to " + autorun);
+                    continue;
+                case "default":
+                    //default config: view true, progName = prog, autorun true
+                    printing = true;
+                    progName = "prog";
+                    try {
+                        controller.addEmptyProgram(progName);
+                    } catch (RepositoryException e) {
+                        System.out.println("Default program name taken, no new program was created");
+                    }
+                    autorun = true;
+                    continue;
+                case "help":
+                    printHelp();
+                    continue;
+                case "step":
+                    try {
+                        System.out.println("Stepping to the next instruction");
+                        controller.step(progName);
+                        if (printing) {
+                            printInternals(progName);
+                        }
+                    } catch (UndefinedVariableException e) {
+                        System.out.println("Undefined variable: " + e.getMessage());
+                    } catch (RepositoryException e) {
+                        System.out.println("Program Exception: " + e.getMessage());
+                    } catch (UndefinedOperationException e) {
+                        System.out.println("Undefined Operation: " + e.getMessage());
+                    }
+                    continue;
+                case "run":
+                    runProgram(progName, printing);
+                    continue;
+            }
+            //it is an instruction, add it to the current program
+            try {
+                controller.addStatementString(cmd, progName);
+                if (autorun) {
+                    runProgram(progName, printing);
                 }
+            } catch (SyntaxException e) {
+                System.out.println(e.getMessage());
+            } catch (RepositoryException e) {
+                System.out.println(e.getMessage());
             }
-            if (input.equals("run")) {
-                try {
-                    controller.run(progName);
-                } catch (UndefinedVariableException e) {
-                    System.out.println(e.getMessage());
-                    //e.printStackTrace();
-                } catch (UndefinedOperationException e) {
-                    System.out.println(e.getMessage());
-                    //e.printStackTrace();
-                } catch (ProgramException e) {
-                    System.out.println(e.getMessage());
-                    //e.printStackTrace();
-                }
-
-            }
-
         }
     }
 
-    private void debug() throws ProgramException, UndefinedVariableException, UndefinedOperationException {
-        String programName1 = "program1";
-        String programName2 = "program2";
-
-        String[] program1 = {"if a then print(b) else print(101+b*10/10-1);", "a=0", "b=10"};
-
-        controller.addEmptyProgram(programName1);
+    private void runProgram(String progName, boolean printing) {
         try {
-            for (String instruction : program1)
-                controller.addStatementString(instruction, programName1);
-
-            System.out.println("Stack:");
-            for (String s : controller.getStackString(programName1)) {
-                System.out.println(s);
+            System.out.println("Running program...");
+            controller.run(progName);
+            if (printing) {
+                printInternals(progName);
             }
-            System.out.println("\nSymbols:");
-
-            for (String key : controller.getSymbols(programName1).keySet()) {
-                System.out.println("VarName: " + key + ": " + controller.getSymbols(programName1).get(key));
-            }
-        } catch (SyntaxException e) {
-            e.printStackTrace();
-        } catch (ProgramException e) {
-            e.printStackTrace();
         } catch (UndefinedVariableException e) {
-            e.printStackTrace();
+            System.out.println("Undefined variable: " + e.getMessage());
+        } catch (RepositoryException e) {
+            System.out.println("Program Exception: " + e.getMessage());
         } catch (UndefinedOperationException e) {
-            e.printStackTrace();
-        }
-
-        while (controller.getStackString(programName1).size() != 0) {
-
-            //readFromConsole("");
-
-            controller.run(programName1);
-
-            System.out.println("Stack:");
-            for (String s : controller.getStackString(programName1)) {
-                System.out.println(s);
-            }
-            System.out.println("\nSymbols:");
-
-            for (String key : controller.getSymbols(programName1).keySet()) {
-                System.out.println("VarName: " + key + ": " + controller.getSymbols(programName1).get(key));
-            }
-            System.out.println("\nOutput:");
-            for (String o : controller.getOutput(programName1)) {
-                System.out.println(o);
-            }
+            System.out.println("Undefined Operation: " + e.getMessage());
         }
     }
 }

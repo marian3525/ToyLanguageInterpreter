@@ -5,7 +5,7 @@ import exceptions.UndefinedVariableException;
 import model.expression.Expression;
 import model.programState.ProgramState;
 
-public class PrintStatement implements Statement {
+public class PrintStatement extends Statement {
     private Expression expression;
     public static final String printRegex = "";
 

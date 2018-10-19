@@ -11,12 +11,13 @@ import model.programState.ProgramState;
 import model.statement.*;
 import org.jetbrains.annotations.NotNull;
 import repository.Repository;
+import repository.RepositoryInterface;
 
 import java.util.Map;
 import java.util.Objects;
 
 public class Controller {
-    Repository repo;
+    private RepositoryInterface repo;
 
     public Controller() {
         repo = new Repository();
@@ -30,7 +31,7 @@ public class Controller {
      * @throws UndefinedOperationException  if an operation without definition is encountered
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
-    public void step(String progName) throws ProgramException, UndefinedOperationException, UndefinedVariableException {
+    public void step(String progName) throws RepositoryException, UndefinedOperationException, UndefinedVariableException {
          ProgramState state = repo.getProgramByName(progName);
          Statement top = state.getExecutionStack().pop();
          top.execute(state);
@@ -43,7 +44,7 @@ public class Controller {
      * @throws UndefinedOperationException  if an operation without definition is encountered
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
-    public void run(String progName) throws ProgramException, UndefinedVariableException, UndefinedOperationException {
+    public void run(String progName) throws RepositoryException, UndefinedVariableException, UndefinedOperationException {
         ProgramState state = repo.getProgramByName(progName);
         while (!state.getExecutionStack().isEmpty()) {
             Statement top = state.getExecutionStack().pop();
@@ -56,13 +57,10 @@ public class Controller {
      * Create a new program which can receive and execute instructions
      * @param progName Name of the program to be created and added into the repo
      */
-    public void addEmptyProgram(String progName) {
+    public void addEmptyProgram(String progName) throws RepositoryException {
         ProgramState state = new ProgramState();
-        try {
+
             repo.addProgram(progName, state);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -122,7 +120,6 @@ public class Controller {
         //should result in 2 strings
         String first = sides[0];
         String second = sides[1];
-        //TODO null in secondType on simple compound like a=1;b=a+1
         String firstType = getStatementType(first);
         String secondType = getStatementType(second);
 
@@ -276,7 +273,7 @@ public class Controller {
      *                   print(a)
      *
      */
-    public void addStatementString(String input, String progName) throws SyntaxException, ProgramException, UndefinedVariableException, UndefinedOperationException {
+    public void addStatementString(String input, String progName) throws SyntaxException, RepositoryException {
         //attempt to find the type of statement
         //simple assignment: split by '=' if contained and check for a rhs and a lhs
         //compound statement: split by ; and split the 2 halves for assignments by splitting by '='
@@ -303,7 +300,7 @@ public class Controller {
     }
 
     @SuppressWarnings("unchecked")
-    public Vector<String> getStackString(String progName) throws ProgramException {
+    public Vector<String> getStackString(String progName) throws RepositoryException {
         //Stack<Statement> s = (Stack<Statement>) repo.getProgramByName(progName).getExecutionStack().clone(); //for java.util
         Stack<Statement> s = repo.getProgramByName(progName).getExecutionStack().clone();
 
@@ -314,11 +311,12 @@ public class Controller {
         }
         return v;
     }
-    public Vector<String> getOutput(String progName) throws ProgramException {
+
+    public Vector<String> getOutput(String progName) throws RepositoryException {
         return repo.getProgramByName(progName).getOutput();
     }
 
-    public Map<String, Integer> getSymbols(String progName) throws ProgramException {
+    public Map<String, Integer> getSymbols(String progName) throws RepositoryException {
         return repo.getProgramByName(progName).getSymbols();
     }
 }
