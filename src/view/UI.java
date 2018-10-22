@@ -114,6 +114,10 @@ public class UI {
                     }
                     autorun = true;
                     continue;
+                case "flags":
+                    System.out.println("Viewing: " + printing);
+                    System.out.println("Autorun: " + autorun);
+                    continue;
                 case "help":
                     printHelp();
                     continue;

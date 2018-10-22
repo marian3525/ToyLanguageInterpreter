@@ -69,13 +69,13 @@ public class Controller {
      * @return Assignment/Compound/If/Print depending on the statement type
      */
     private String getStatementType(@NotNull String statementStr) {
-
+        //TODO returns assignment instead of compound for "a=a+1;print(a)"
         String[] aux = statementStr.split("=");
         if(aux.length == 2 && !statementStr.contains(";"))
             return "AssignmentStatement";
-
+        //TODO. Returns CompoundStatement if one of the branches of an if statement contains a compoundStatement
         aux = statementStr.split(";");
-        if(aux.length >= 2) {
+        if (aux.length >= 2 && !statementStr.contains("if")) {
             return "CompoundStatement";
         }
         if(statementStr.contains("if") && statementStr.contains("then") && statementStr.contains("else")) {
@@ -255,7 +255,9 @@ public class Controller {
         // elseStatement at 5
         conditionType = getExpressionType(tokens[1]);
         thenStatementType = getStatementType(tokens[3]);
-        elseStatementType = getStatementType(tokens[5].replace(";", ""));   //
+        //elseStatementType = getStatementType(tokens[5].replace(";", ""));   //it would replace the ;
+        //in compound statements from the else branch as well
+        elseStatementType = getStatementType(tokens[5]);
 
         condition = getExpressionFromType(tokens[1], conditionType);
         thenStatement = getStatementFromType(tokens[3], Objects.requireNonNull(thenStatementType));

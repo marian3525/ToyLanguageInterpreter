@@ -1,7 +1,10 @@
 package tests;
 
 import controller.Controller;
-import exceptions.*;
+import exceptions.RepositoryException;
+import exceptions.SyntaxException;
+import exceptions.UndefinedOperationException;
+import exceptions.UndefinedVariableException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,16 +13,16 @@ public class ControllerTest {
     Controller c;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         c = new Controller();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
     }
 
     @Test
-    public void step() throws ProgramException, UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException {
+    public void step() throws UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException {
         Controller controller = new Controller();
         controller.addEmptyProgram("test");
 
@@ -58,7 +61,26 @@ public class ControllerTest {
 
     @Test
     public void addEmptyProgram() {
-        assert(true);
+        Controller c = new Controller();
+        //attempt to get output of nonexistent program, should throw
+        try {
+            assert c.getOutput("prog") != null;
+        } catch (RepositoryException ex) {
+            assert true;
+        }
+
+        try {
+            c.addEmptyProgram("prog");
+            assert true;
+        } catch (RepositoryException e) {
+            assert false;
+        }
+        //added program, should not throw now
+        try {
+            assert c.getOutput("prog") != null;
+        } catch (RepositoryException ex) {
+            assert false;
+        }
     }
 
     @Test
