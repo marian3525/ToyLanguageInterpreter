@@ -13,6 +13,9 @@ public class UI {
 
     public UI() {
         controller = new Controller();
+    }
+
+    public void start() {
         runUI();
     }
 
@@ -66,6 +69,7 @@ public class UI {
         String progName = "";
         boolean printing = false;
         boolean autorun = false;
+
         while (!quitting) {
             String cmd = readFromConsole("(" + progName + ")" + ">");
             String[] parts = cmd.split(" ");
@@ -122,19 +126,7 @@ public class UI {
                     printHelp();
                     continue;
                 case "step":
-                    try {
-                        System.out.println("Stepping to the next instruction");
-                        controller.step(progName);
-                        if (printing) {
-                            printInternals(progName);
-                        }
-                    } catch (UndefinedVariableException e) {
-                        System.out.println("Undefined variable: " + e.getMessage());
-                    } catch (RepositoryException e) {
-                        System.out.println("Program Exception: " + e.getMessage());
-                    } catch (UndefinedOperationException e) {
-                        System.out.println("Undefined Operation: " + e.getMessage());
-                    }
+                    stepProgram(progName, printing);
                     continue;
                 case "run":
                     runProgram(progName, printing);
@@ -146,11 +138,12 @@ public class UI {
                 if (autorun) {
                     runProgram(progName, printing);
                 }
-            } catch (SyntaxException e) {
-                System.out.println(e.getMessage());
             } catch (RepositoryException e) {
                 System.out.println(e.getMessage());
+            } catch (SyntaxException e) {
+                System.out.println(e.getMessage());
             }
+
         }
     }
 
@@ -167,6 +160,26 @@ public class UI {
             System.out.println("Program Exception: " + e.getMessage());
         } catch (UndefinedOperationException e) {
             System.out.println("Undefined Operation: " + e.getMessage());
+        } catch (NullPointerException npe) {
+            System.out.println("Runtime exception: " + npe.getMessage());
+        }
+    }
+
+    private void stepProgram(String progName, boolean printing) {
+        try {
+            System.out.println("Stepping to the next instruction");
+            controller.step(progName);
+            if (printing) {
+                printInternals(progName);
+            }
+        } catch (UndefinedVariableException e) {
+            System.out.println("Undefined variable: " + e.getMessage());
+        } catch (RepositoryException e) {
+            System.out.println("Program Exception: " + e.getMessage());
+        } catch (UndefinedOperationException e) {
+            System.out.println("Undefined Operation: " + e.getMessage());
+        } catch (NullPointerException npe) {
+            System.out.println("Runtime exception: " + npe.getMessage());
         }
     }
 }

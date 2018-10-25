@@ -7,9 +7,7 @@ import model.expression.ConstantExpression;
 import model.expression.Expression;
 import model.expression.VariableExpression;
 import model.programState.ProgramState;
-import model.statement.IfStatement;
-import model.statement.PrintStatement;
-import model.statement.Statement;
+import model.statement.*;
 import org.junit.Test;
 
 public class IfStatementTest {
@@ -53,6 +51,24 @@ public class IfStatementTest {
             assert state.getExecutionStack().pop() == elseStatement;
             n.execute(state);
             assert state.getExecutionStack().pop() == elseStatement;
+
+        } catch (UndefinedOperationException | UndefinedVariableException e) {
+            assert false;
+        }
+
+        CompoundStatement s = new CompoundStatement(new AssignmentStatement("a", new ArithmeticExpression
+                (new VariableExpression("a"), new ConstantExpression(1), "+")),
+                new PrintStatement(new VariableExpression("a")));
+        IfStatement compIf = new IfStatement(new ConstantExpression(1), new PrintStatement(new VariableExpression("a")),
+                s);
+        IfStatement compIf1 = new IfStatement(new ConstantExpression(0), new PrintStatement(new VariableExpression("a")),
+                s);
+        try {
+            compIf.execute(state);
+            assert state.getExecutionStack().peek().toString().equals("print(a)");
+            compIf1.execute(state);
+            //(a = a + 1;print(a)
+            assert state.getExecutionStack().peek().toString().equals("(a = a+1;print(a))");
 
         } catch (UndefinedOperationException | UndefinedVariableException e) {
             assert false;

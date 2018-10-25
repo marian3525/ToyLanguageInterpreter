@@ -1,10 +1,13 @@
 package model.expression;
 
+import org.intellij.lang.annotations.RegExp;
+
 import java.util.Map;
 
 public class ConstantExpression extends Expression {
     private int value;
-    public static final String constantRegex = "^[-+]?([0]{1})|([1-9]\\d*$)";
+    @RegExp
+    public static final String constantRegex = "^[-+]?(([0])|([1-9]\\d*$))";
     public ConstantExpression(int value) {
         this.value = value;
     }

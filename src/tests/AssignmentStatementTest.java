@@ -39,5 +39,14 @@ public class AssignmentStatementTest {
         } catch (UndefinedVariableException | UndefinedOperationException ex) {
             assert false;
         }
+
+        e = new AssignmentStatement("a", new ConstantExpression(-1));
+        try {
+            e.execute(state);
+            assert state.getSymbols().get("a") == -1;
+        } catch (UndefinedVariableException | UndefinedOperationException ex) {
+            assert false;
+        }
+
     }
 }

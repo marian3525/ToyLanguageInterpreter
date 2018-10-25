@@ -69,11 +69,9 @@ public class Controller {
      * @return Assignment/Compound/If/Print depending on the statement type
      */
     private String getStatementType(@NotNull String statementStr) {
-        //TODO returns assignment instead of compound for "a=a+1;print(a)"
         String[] aux = statementStr.split("=");
         if(aux.length == 2 && !statementStr.contains(";"))
             return "AssignmentStatement";
-        //TODO. Returns CompoundStatement if one of the branches of an if statement contains a compoundStatement
         aux = statementStr.split(";");
         if (aux.length >= 2 && !statementStr.contains("if")) {
             return "CompoundStatement";
@@ -211,10 +209,10 @@ public class Controller {
         String sides[] = input.split("=");
         String varName = sides[0];      //there will always be exactly one variable in the lhs
         AssignmentStatement s = null;
-        //depending whether the rhs is a const, var or arith_expr
+        //depending on whether the rhs is a const, var or arith_expr
 
         switch (getExpressionType(sides[1])) {
-            case "ConstantExpression":  //b=0 doesn't match
+            case "ConstantExpression":
                 int value = Integer.parseInt(sides[1]);
                 s = new AssignmentStatement(varName, new ConstantExpression(value));
                 break;

@@ -1,12 +1,9 @@
-import controller.Controller;
-import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
-import model.adt.Stack;
 import view.UI;
 
 public class Main {
-    public static void main(String[] args) throws UndefinedVariableException, UndefinedOperationException {
+    public static void main(String[] args) {
 
         UI ui = new UI();
+        ui.start();
     }
 }
