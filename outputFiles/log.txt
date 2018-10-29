@@ -1,0 +1,16 @@
+Execution stack:
+
+Symbol Table:
+a --> 1 | 
+Output:
+
+File Table:
+1 --> test.txt=java.io.BufferedReader@30f39991 | ----------------------------
+Execution stack:
+
+Symbol Table:
+a --> 333 | 
+Output:
+
+File Table:
+1 --> test.txt=java.io.BufferedReader@30f39991 | ----------------------------
