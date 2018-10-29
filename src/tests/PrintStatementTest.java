@@ -25,6 +25,8 @@ public class PrintStatementTest {
 
         } catch (UndefinedOperationException | UndefinedVariableException e) {
             assert false;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
         }
     }
 }

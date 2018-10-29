@@ -32,7 +32,7 @@ public class ExpressionTest {
         assertArrayEquals(expected.toArray(), Expression.tokenize(expr).toArray());
     }
     @Test
-    public void infixToPostfix() {
+    public void infixToPostfixTest() {
         String infix = "2*3-8/2";
         try {
             Vector<String> postfix = Expression.infixToPostfix(infix);
@@ -64,6 +64,12 @@ public class ExpressionTest {
     }
 
     @Test
+    public void postfixToInfixTest() {
+        String postfix = "235*+";
+        //Vector<String> infix = Expression.postfixToInfix(postfix);
+        //assertArrayEquals(infix.toArray(), new String[] {"2", "+", "3", "*", "5"});
+    }
+    @Test
     public void buildExpressionFromPostfix() throws ProgramException, SyntaxException {
         Vector<String> postfix1 = new Vector<String>(10);
         postfix1.add("2");
@@ -71,8 +77,7 @@ public class ExpressionTest {
         postfix1.add("4");
         postfix1.add("*");
         postfix1.add("+");
-        Vector<String> postfix2=null;
-        postfix2 = Expression.infixToPostfix("2+(3+2*8)/2");
+        Vector<String> postfix2 = Expression.infixToPostfix("2+(3+2*8)/2");
 
         Expression e1 = Expression.buildExpressionFromPostfix(postfix1);
         Expression e2;

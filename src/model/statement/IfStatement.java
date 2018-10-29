@@ -4,11 +4,15 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.Expression;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
+
+import java.io.IOException;
 
 public class IfStatement extends Statement {
     private Expression condition;
     private Statement thenStatement;
     private Statement elseStatement;
+    @RegExp
     public static final String ifRegex = "";
 
     public IfStatement(Expression condition, Statement thenStatement, Statement elseStatement) {
@@ -24,7 +28,7 @@ public class IfStatement extends Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
         if(condition.evaluate(programState.getSymbols()) != 0) {
             programState.getExecutionStack().push(thenStatement);
         }

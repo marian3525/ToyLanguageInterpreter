@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import repository.Repository;
 import repository.RepositoryInterface;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -31,10 +32,11 @@ public class Controller {
      * @throws UndefinedOperationException  if an operation without definition is encountered
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
-    public void step(String progName) throws RepositoryException, UndefinedOperationException, UndefinedVariableException {
+    public void step(String progName) throws RepositoryException, UndefinedOperationException, UndefinedVariableException, IOException {
          ProgramState state = repo.getProgramByName(progName);
          Statement top = state.getExecutionStack().pop();
          top.execute(state);
+        repo.logProgramState(state);
     }
 
     /**
@@ -44,11 +46,12 @@ public class Controller {
      * @throws UndefinedOperationException  if an operation without definition is encountered
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
-    public void run(String progName) throws RepositoryException, UndefinedVariableException, UndefinedOperationException {
+    public void run(String progName) throws RepositoryException, UndefinedVariableException, UndefinedOperationException, IOException {
         ProgramState state = repo.getProgramByName(progName);
         while (!state.getExecutionStack().isEmpty()) {
             Statement top = state.getExecutionStack().pop();
             top.execute(state);
+            repo.logProgramState(state);
         }
 
     }
@@ -70,6 +73,18 @@ public class Controller {
      */
     private String getStatementType(@NotNull String statementStr) {
         String[] aux = statementStr.split("=");
+        String[] openAndReadCheck = statementStr.split(",");
+
+        if (statementStr.startsWith("openFile") && openAndReadCheck.length == 2) {
+            return "OpenFileStatement";
+        }
+        if (statementStr.startsWith("readFile") && openAndReadCheck.length == 2) {
+            return "ReadFileStatement";
+        }
+        if (statementStr.startsWith("closeFile") && openAndReadCheck.length == 1) {
+            return "CloseFileStatement";
+        }
+
         if(aux.length == 2 && !statementStr.contains(";"))
             return "AssignmentStatement";
         aux = statementStr.split(";");
@@ -264,20 +279,64 @@ public class Controller {
         IfStatement ifStatement = new IfStatement(condition, thenStatement, elseStatement);
         return ifStatement;
     }
+
+    private CloseFileStatement getCloseFileStatementFromString(String input) throws SyntaxException {
+        Expression fileIdExpression;
+
+        String fileId = input.replace("closeFile(", "").replace(")", "");
+        String expressionType = getExpressionType(fileId);
+
+        fileIdExpression = getExpressionFromType(fileId, expressionType);
+
+        CloseFileStatement closeFileStatement = new CloseFileStatement(fileIdExpression);
+        return closeFileStatement;
+    }
+
+    private OpenFileStatement getOpenFileStatementFromString(String input) {
+        String varName;     //will store the UID of the file, generated in the table insertion
+        String filename;    //the name of the filename to be opened
+        input = input.replace(" ", "");     //delete spaces so that variables don't end up with spaces in them
+
+        String[] params = input.split(",");
+        //extract the varName
+        varName = params[0].replace("openFile(", "");
+        filename = params[1].replace(")", "");
+
+        OpenFileStatement openFileStatement = new OpenFileStatement(varName, filename);
+        return openFileStatement;
+    }
+
+    private ReadFileStatement getReadFileStatementFromString(String input) throws SyntaxException {
+        Expression fileId;
+        String fileIdStr;
+        String varName;
+        input = input.replace(" ", "");     //delete spaces so that variables don't end up with spaces in them
+
+        String[] params = input.split(",");
+        //extract the varName
+        fileIdStr = params[0].replace("readFile(", "");
+        varName = params[1].replace(")", "");
+
+        String exprType = getExpressionType(fileIdStr);
+        fileId = getExpressionFromType(fileIdStr, exprType);
+        ReadFileStatement readFileStatement = new ReadFileStatement(fileId, varName);
+        return readFileStatement;
+    }
+
     /**
      * Parse the input string and create the corresponding statements.
      * Assuming only valid program lines are used as params
-     * Algorithm:
+     * attempt to find the type of statement
+     * simple assignment: split by '=' if contained and check for a rhs and a lhs
+     * compound statement: split by ; and split the 2 halves for assignments by splitting by '='
+     *
      * @param input String received form the UI assumed to be syntactically correct
      *              E.g. a=1+2;
      *                   print(a)
      *
      */
     public void addStatementString(String input, String progName) throws SyntaxException, RepositoryException {
-        //attempt to find the type of statement
-        //simple assignment: split by '=' if contained and check for a rhs and a lhs
-        //compound statement: split by ; and split the 2 halves for assignments by splitting by '='
-        //or regex
+
         Statement s = null;
         if(input == null || progName == null)
             return;
@@ -295,13 +354,22 @@ public class Controller {
                 break;
             case "IfStatement":
                 s = getIfStatementFromString(input);
+                break;
+            case "CloseFileStatement":
+                s = getCloseFileStatementFromString(input);
+                break;
+            case "OpenFileStatement":
+                s = getOpenFileStatementFromString(input);
+                break;
+            case "ReadFileStatement":
+                s = getReadFileStatementFromString(input);
+                break;
         }
         repo.getProgramByName(progName).getExecutionStack().push(s);
     }
 
     @SuppressWarnings("unchecked")
     public Vector<String> getStackString(String progName) throws RepositoryException {
-        //Stack<Statement> s = (Stack<Statement>) repo.getProgramByName(progName).getExecutionStack().clone(); //for java.util
         Stack<Statement> s = repo.getProgramByName(progName).getExecutionStack().clone();
 
         Vector<String> v = new Vector<>(10);

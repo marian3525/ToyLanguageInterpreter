@@ -1,6 +1,10 @@
 package model.statement;
 
+import exceptions.UndefinedOperationException;
+import exceptions.UndefinedVariableException;
 import model.programState.ProgramState;
+
+import java.io.IOException;
 
 public class CompoundStatement extends Statement {
     private Statement first;
@@ -12,7 +16,7 @@ public class CompoundStatement extends Statement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
         programState.getExecutionStack().push(second);
         programState.getExecutionStack().push(first);
         return programState;

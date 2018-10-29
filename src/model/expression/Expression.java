@@ -112,6 +112,13 @@ public abstract class Expression {
         return output;
     }
 
+    public static Vector<String> postfixToInfix(Vector<String> postfix) {
+        Vector<String> output = new Vector<>();
+        Stack<String> stack = new Stack<>();
+
+        return output;
+    }
+
     /**
      * @param ch: operator to check
      * @return The priority order of the operator
@@ -169,8 +176,8 @@ public abstract class Expression {
     }
 
     /**
-     * @param tok a token
-     * @return
+     * @param tok a token string
+     * @return Expression built from the string
      */
     private static Expression convertStringToExpression(String tok) {
         //if it contains letters, it must be a variable with tok as name

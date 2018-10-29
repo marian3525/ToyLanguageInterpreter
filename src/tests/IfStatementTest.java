@@ -54,6 +54,8 @@ public class IfStatementTest {
 
         } catch (UndefinedOperationException | UndefinedVariableException e) {
             assert false;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
         }
 
         CompoundStatement s = new CompoundStatement(new AssignmentStatement("a", new ArithmeticExpression
@@ -72,6 +74,8 @@ public class IfStatementTest {
 
         } catch (UndefinedOperationException | UndefinedVariableException e) {
             assert false;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
         }
     }
 }

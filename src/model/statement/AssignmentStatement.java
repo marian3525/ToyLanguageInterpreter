@@ -5,14 +5,17 @@ import exceptions.UndefinedVariableException;
 import model.adt.Stack;
 import model.expression.Expression;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Map;
 
 
 public class AssignmentStatement extends Statement {
     private String id;
     private Expression expression;
+    @RegExp
     public static final String assignmentRegex= "^[a-zA-Z_]+[a-zA-Z0-9_]*=[+-]?([0]{1}$|[1-9][0-9]*$)";
 
     public AssignmentStatement(String id, Expression expression) {
@@ -26,7 +29,7 @@ public class AssignmentStatement extends Statement {
     }
 
     @Override
-    public ProgramState execute(@NotNull ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
+    public ProgramState execute(@NotNull ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
 
         Stack<Statement> stack = programState.getExecutionStack();
         Map<String, Integer> symbols = programState.getSymbols();

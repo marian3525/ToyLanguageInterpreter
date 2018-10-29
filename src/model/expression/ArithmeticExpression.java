@@ -18,8 +18,8 @@ public class ArithmeticExpression extends Expression{
 
     @Override
     public String toString() {
-        String firstStr="";
-        String secondStr="";
+        String firstStr;
+        String secondStr;
 
         if(first instanceof ArithmeticExpression)
             //put the expression in ()
@@ -40,7 +40,8 @@ public class ArithmeticExpression extends Expression{
         switch(op) {
             case "+": return first.evaluate(symbols) + second.evaluate(symbols);
             case "-": return first.evaluate(symbols) - second.evaluate(symbols);
-            case "/": return first.evaluate(symbols) / second.evaluate(symbols);    //TODO throw ArithmeticException if the second is 0z
+            case "/":
+                return first.evaluate(symbols) / second.evaluate(symbols);
             case "*": return first.evaluate(symbols) * second.evaluate(symbols);
         }
         //if it hasn't returned, the op isn't supported, throw an error

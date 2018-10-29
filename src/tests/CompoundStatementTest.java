@@ -19,7 +19,15 @@ public class CompoundStatementTest {
 
         CompoundStatement s = new CompoundStatement(first, second);
 
-        s.execute(state);
+        try {
+            s.execute(state);
+        } catch (exceptions.UndefinedOperationException e) {
+            e.printStackTrace();
+        } catch (exceptions.UndefinedVariableException e) {
+            e.printStackTrace();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
 
         assert state.getExecutionStack().peek() == first;
         state.getExecutionStack().pop();

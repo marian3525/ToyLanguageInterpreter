@@ -9,6 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class ControllerTest {
     Controller c;
 
@@ -22,7 +24,7 @@ public class ControllerTest {
     }
 
     @Test
-    public void step() throws UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException {
+    public void step() throws UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException, IOException {
         Controller controller = new Controller();
         controller.addEmptyProgram("test");
 

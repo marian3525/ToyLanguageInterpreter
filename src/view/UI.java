@@ -6,6 +6,7 @@ import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class UI {
@@ -142,6 +143,8 @@ public class UI {
                 System.out.println(e.getMessage());
             } catch (SyntaxException e) {
                 System.out.println(e.getMessage());
+            } catch (NullPointerException npe) {
+                System.out.println("Parsing failed: " + npe.getMessage());
             }
 
         }
@@ -162,6 +165,8 @@ public class UI {
             System.out.println("Undefined Operation: " + e.getMessage());
         } catch (NullPointerException npe) {
             System.out.println("Runtime exception: " + npe.getMessage());
+        } catch (IOException ioe) {
+            System.out.println("IOException: " + ioe.getMessage());
         }
     }
 
@@ -180,6 +185,8 @@ public class UI {
             System.out.println("Undefined Operation: " + e.getMessage());
         } catch (NullPointerException npe) {
             System.out.println("Runtime exception: " + npe.getMessage());
+        } catch (IOException ioe) {
+            System.out.println("IOException: " + ioe.getMessage());
         }
     }
 }

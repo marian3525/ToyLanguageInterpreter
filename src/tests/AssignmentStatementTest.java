@@ -28,6 +28,8 @@ public class AssignmentStatementTest {
             assert state.getSymbols().get("a") == 3;
         } catch (UndefinedVariableException | UndefinedOperationException ex) {
             assert false;
+        } catch (java.io.IOException e1) {
+            e1.printStackTrace();
         }
 
         e = new AssignmentStatement("b", new ArithmeticExpression(new VariableExpression("a"),
@@ -38,6 +40,8 @@ public class AssignmentStatementTest {
             assert state.getSymbols().get("b") == 4;
         } catch (UndefinedVariableException | UndefinedOperationException ex) {
             assert false;
+        } catch (java.io.IOException e1) {
+            e1.printStackTrace();
         }
 
         e = new AssignmentStatement("a", new ConstantExpression(-1));
@@ -46,6 +50,8 @@ public class AssignmentStatementTest {
             assert state.getSymbols().get("a") == -1;
         } catch (UndefinedVariableException | UndefinedOperationException ex) {
             assert false;
+        } catch (java.io.IOException e1) {
+            e1.printStackTrace();
         }
 
     }
