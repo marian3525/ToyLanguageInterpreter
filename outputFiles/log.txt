@@ -1,16 +1,27 @@
 Execution stack:
+Read from file: a into var: a
+print(a)
 
 Symbol Table:
 a --> 1 | 
 Output:
 
 File Table:
-1 --> test.txt=java.io.BufferedReader@30f39991 | ----------------------------
+1 --> example1.txt=java.io.BufferedReader@30f39991 | ----------------------------
 Execution stack:
+print(a)
 
 Symbol Table:
 a --> 333 | 
 Output:
 
 File Table:
-1 --> test.txt=java.io.BufferedReader@30f39991 | ----------------------------
+1 --> example1.txt=java.io.BufferedReader@30f39991 | ----------------------------
+Execution stack:
+
+Symbol Table:
+a --> 333 | 
+Output:
+333 | 
+File Table:
+1 --> example1.txt=java.io.BufferedReader@30f39991 | ----------------------------

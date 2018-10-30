@@ -1,4 +1,4 @@
-package view;
+package view.commandLineInterface;
 
 import controller.Controller;
 import exceptions.RepositoryException;

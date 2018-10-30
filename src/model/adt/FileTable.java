@@ -23,9 +23,11 @@ public class FileTable implements FileTableInterface {
     @Override
     public int storeFile(String filename, String path) throws IOException {
         descriptor++;
-        //create the file:
-        new BufferedWriter(new FileWriter(path + "\\" + filename)).close();
-
+        //create the file if it doesn't exist
+        File f = new File(path + "\\" + filename);
+        if (!f.exists() || f.isDirectory()) {
+            new BufferedWriter(new FileWriter(path + "\\" + filename)).close();
+        }
         files.put(descriptor, new Pair<>(filename, new BufferedReader(
                 new FileReader(path + "\\" + filename))));
         return descriptor;

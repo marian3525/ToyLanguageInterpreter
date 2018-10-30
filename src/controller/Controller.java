@@ -57,7 +57,8 @@ public class Controller {
     }
 
     /**
-     * Create a new program which can receive and execute instructions
+     * Create a new program which can receive and execute instructions.
+     * Called before starting to receive statements from the UI
      * @param progName Name of the program to be created and added into the repo
      */
     public void addEmptyProgram(String progName) throws RepositoryException {
