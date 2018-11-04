@@ -4,39 +4,34 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
-import org.intellij.lang.annotations.RegExp;
 
 import java.io.IOException;
 
-public class PrintStatement extends AbstractStatement {
-    private AbstractExpression expression;
-    @RegExp
-    public static final String printRegex = "";
+public class ReturnStatement extends AbstractStatement {
+
     private String functionName;
+    private AbstractExpression value;
 
-    public PrintStatement(AbstractExpression expression) {
-        this.expression = expression;
-        this.functionName = "main";
-    }
-
-    public PrintStatement(AbstractExpression expression, String functionName) {
-        this.expression = expression;
+    public ReturnStatement(String functionName, AbstractExpression value) {
         this.functionName = functionName;
+        this.value = value;
     }
 
     @Override
     public String toString() {
-        return "print(" + expression.toString() + ")";
+        return "Return from: " + functionName + " with " + value;
     }
+
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
-        programState.getOutput().add(Integer.toString(expression.evaluate(programState.getSymbols())));
+        //flag the end of the execution
+        programState.setFunctionFinished(true);
         return programState;
     }
 
     @Override
     public String getFunction() {
-        return null;
+        return functionName;
     }
 
     @Override

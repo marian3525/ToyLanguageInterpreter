@@ -1,17 +1,17 @@
 package repository;
 
 import exceptions.RepositoryException;
-import model.adt.HashMap;
-import model.adt.Stack;
-import model.adt.Vector;
 import model.programState.ProgramState;
-import model.statement.Statement;
+import model.statement.AbstractStatement;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
+import java.util.Vector;
 
 public class Repository implements RepositoryInterface {
     //vector of running programs
@@ -77,11 +77,12 @@ public class Repository implements RepositoryInterface {
      * @param state: the program state to be printed
      * @throws IOException if creating the file failed
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void logProgramState(ProgramState state) throws IOException {
         PrintWriter logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
         //print the executionStack
-        Stack<Statement> s = state.getExecutionStack().clone();
+        Stack<AbstractStatement> s = (Stack<AbstractStatement>) state.getExecutionStack().clone();
         StringBuilder builder = new StringBuilder();
 
         builder.append("Execution stack:" + System.lineSeparator());

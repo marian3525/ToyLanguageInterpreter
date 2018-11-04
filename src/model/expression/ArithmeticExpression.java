@@ -5,12 +5,12 @@ import exceptions.UndefinedVariableException;
 
 import java.util.Map;
 
-public class ArithmeticExpression extends Expression{
-    private Expression first;
-    private Expression second;
+public class ArithmeticExpression extends AbstractExpression {
+    private AbstractExpression first;
+    private AbstractExpression second;
     private String op;
 
-    public ArithmeticExpression(Expression first, Expression second, String op) {
+    public ArithmeticExpression(AbstractExpression first, AbstractExpression second, String op) {
         this.first = first;
         this.second = second;
         this.op = op;

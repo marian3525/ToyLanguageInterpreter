@@ -4,7 +4,7 @@ import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
 
-public class ConstantExpression extends Expression {
+public class ConstantExpression extends AbstractExpression {
     private int value;
     @RegExp
     public static final String constantRegex = "^[-+]?(([0])|([1-9]\\d*$))";

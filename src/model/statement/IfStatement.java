@@ -2,23 +2,33 @@ package model.statement;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import model.expression.Expression;
+import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
 
 import java.io.IOException;
 
-public class IfStatement extends Statement {
-    private Expression condition;
-    private Statement thenStatement;
-    private Statement elseStatement;
+public class IfStatement extends AbstractStatement {
+    private AbstractExpression condition;
+    private AbstractStatement thenStatement;
+    private AbstractStatement elseStatement;
+    private String functionName;
     @RegExp
     public static final String ifRegex = "";
 
-    public IfStatement(Expression condition, Statement thenStatement, Statement elseStatement) {
+    public IfStatement(AbstractExpression condition, AbstractStatement thenStatement, AbstractStatement elseStatement) {
         this.condition = condition;
         this.thenStatement = thenStatement;
         this.elseStatement = elseStatement;
+        this.functionName = "main";
+    }
+
+    public IfStatement(AbstractExpression condition, AbstractStatement thenStatement, AbstractStatement elseStatement,
+                       String functionName) {
+        this.condition = condition;
+        this.thenStatement = thenStatement;
+        this.elseStatement = elseStatement;
+        this.functionName = functionName;
     }
 
     @Override
@@ -36,5 +46,15 @@ public class IfStatement extends Statement {
             programState.getExecutionStack().push(elseStatement);
         }
         return programState;
+    }
+
+    @Override
+    public String getFunction() {
+        return functionName;
+    }
+
+    @Override
+    public void setFunction(String functionName) {
+        this.functionName = functionName;
     }
 }

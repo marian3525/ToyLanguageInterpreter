@@ -3,10 +3,10 @@ package tests;
 import model.expression.ConstantExpression;
 import model.expression.VariableExpression;
 import model.programState.ProgramState;
+import model.statement.AbstractStatement;
 import model.statement.AssignmentStatement;
 import model.statement.CompoundStatement;
 import model.statement.PrintStatement;
-import model.statement.Statement;
 import org.junit.Test;
 public class CompoundStatementTest {
 
@@ -14,8 +14,8 @@ public class CompoundStatementTest {
     public void testExecute() {
         ProgramState state = new ProgramState();
 
-        Statement first = new AssignmentStatement("a", new ConstantExpression(3));
-        Statement second = new PrintStatement(new VariableExpression("a"));
+        AbstractStatement first = new AssignmentStatement("a", new ConstantExpression(3));
+        AbstractStatement second = new PrintStatement(new VariableExpression("a"));
 
         CompoundStatement s = new CompoundStatement(first, second);
 
@@ -36,8 +36,8 @@ public class CompoundStatementTest {
 
     @Test
     public void testToString() {
-        Statement first = new AssignmentStatement("a", new ConstantExpression(3));
-        Statement second = new PrintStatement(new VariableExpression("a"));
+        AbstractStatement first = new AssignmentStatement("a", new ConstantExpression(3));
+        AbstractStatement second = new PrintStatement(new VariableExpression("a"));
 
         CompoundStatement s = new CompoundStatement(first, second);
         assert s.toString().equals("(" + first.toString() + ";" + second.toString() + ")");

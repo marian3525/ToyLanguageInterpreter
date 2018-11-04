@@ -3,11 +3,12 @@ package tests;
 
 import exceptions.ProgramException;
 import exceptions.SyntaxException;
-import model.adt.Vector;
+import model.expression.AbstractExpression;
 import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
-import model.expression.Expression;
 import org.junit.Test;
+
+import java.util.Vector;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -29,34 +30,34 @@ public class ExpressionTest {
         expected.add("v3");
         expected.add(")");
         //assert(false);
-        assertArrayEquals(expected.toArray(), Expression.tokenize(expr).toArray());
+        assertArrayEquals(expected.toArray(), AbstractExpression.tokenize(expr).toArray());
     }
     @Test
     public void infixToPostfixTest() {
         String infix = "2*3-8/2";
         try {
-            Vector<String> postfix = Expression.infixToPostfix(infix);
+            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"2","3","*","8","2","/","-"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "2*3-8";
         try {
-            Vector<String> postfix = Expression.infixToPostfix(infix);
+            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"2","3","*","8","-"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "2*(3-8)";
         try {
-            Vector<String> postfix = Expression.infixToPostfix(infix);
+            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"2", "3", "8", "-", "*"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "21*(30-8)";
         try {
-            Vector<String> postfix = Expression.infixToPostfix(infix);
+            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"21", "30", "8", "-", "*"});
         } catch (SyntaxException e) {
             assert(false);
@@ -66,7 +67,7 @@ public class ExpressionTest {
     @Test
     public void postfixToInfixTest() {
         String postfix = "235*+";
-        //Vector<String> infix = Expression.postfixToInfix(postfix);
+        //Vector<String> infix = AbstractExpression.postfixToInfix(postfix);
         //assertArrayEquals(infix.toArray(), new String[] {"2", "+", "3", "*", "5"});
     }
     @Test
@@ -77,14 +78,14 @@ public class ExpressionTest {
         postfix1.add("4");
         postfix1.add("*");
         postfix1.add("+");
-        Vector<String> postfix2 = Expression.infixToPostfix("2+(3+2*8)/2");
+        Vector<String> postfix2 = AbstractExpression.infixToPostfix("2+(3+2*8)/2");
 
-        Expression e1 = Expression.buildExpressionFromPostfix(postfix1);
-        Expression e2;
-        e2 = Expression.buildExpressionFromPostfix(postfix2);
+        AbstractExpression e1 = AbstractExpression.buildExpressionFromPostfix(postfix1);
+        AbstractExpression e2;
+        e2 = AbstractExpression.buildExpressionFromPostfix(postfix2);
 
 
-        Expression e1ShouldBe = new ArithmeticExpression(new ConstantExpression(2), new ArithmeticExpression
+        AbstractExpression e1ShouldBe = new ArithmeticExpression(new ConstantExpression(2), new ArithmeticExpression
                 (new ConstantExpression(3), new ConstantExpression(4), "*"), "+");
         assert(e1.toString().equals(e1ShouldBe.toString()));
 

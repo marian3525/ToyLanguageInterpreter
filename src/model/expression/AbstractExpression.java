@@ -3,14 +3,15 @@ package model.expression;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import model.adt.Stack;
-import model.adt.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.EmptyStackException;
 import java.util.Map;
+import java.util.Stack;
+import java.util.Vector;
 
 
-public abstract class Expression {
+public abstract class AbstractExpression {
 
     public abstract String toString();
 
@@ -141,29 +142,29 @@ public abstract class Expression {
 
     /**
      * @param postfix : Vector of strings representing token of the expression in postfix notation
-     * @return An Expression built from the postfix expression
+     * @return An AbstractExpression built from the postfix expression
      */
     public static ArithmeticExpression buildExpressionFromPostfix(Vector<String> postfix) {
-        Stack<Expression> stack = new Stack<>();
+        Stack<AbstractExpression> stack = new Stack<>();
 
         for (String tok : postfix) {
             //if it is a variable or a constant, push it to the stack
             if (!tok.matches("[-+*/|\\s*]")) {
                 //convert the token tok to the appropriate type of expression
-                Expression exp = convertStringToExpression(tok);
+                AbstractExpression exp = convertStringToExpression(tok);
                 stack.push(exp);
             } else {
                 //if it is an operator, pop 2 from the stack, create a new expression using the operator
                 //and push it back to the stack7
-                Expression second = null;
-                Expression first = null;
+                AbstractExpression second = null;
+                AbstractExpression first = null;
                 try {
                     second = stack.pop();
                     first = stack.pop();
                 } catch (EmptyStackException e) {
                     //throw new ProgramException("Error parsing expressin");
                 }
-                Expression combined = new ArithmeticExpression(first, second, tok);
+                AbstractExpression combined = new ArithmeticExpression(first, second, tok);
                 stack.push(combined);
             }
         }
@@ -177,11 +178,11 @@ public abstract class Expression {
 
     /**
      * @param tok a token string
-     * @return Expression built from the string
+     * @return AbstractExpression built from the string
      */
-    private static Expression convertStringToExpression(String tok) {
+    private static AbstractExpression convertStringToExpression(String tok) {
         //if it contains letters, it must be a variable with tok as name
-        Expression output = null;
+        AbstractExpression output = null;
         if (tok.matches("[a-z]*")) {
             output = new VariableExpression(tok);
         }
@@ -192,4 +193,41 @@ public abstract class Expression {
         return output;
     }
 
+    /**
+     * Find the type of expression which fits the given semantics
+     *
+     * @param expression: expression whose type needs to be identified
+     * @return: the type of expression as class
+     */
+    @NotNull
+    public static String getExpressionType(String expression) {
+        if (expression.matches(ConstantExpression.constantRegex)) {
+            return "ConstantExpression";
+        } else if (expression.matches(VariableExpression.variableRegex)) {
+            return "VariableExpression";
+        } else {
+            return "ArithmeticExpression";
+        }
+    }
+
+    /**
+     * @param expressionStr  string representation of an expression
+     * @param expressionType type of expression: (constant, variable or arithmetic)
+     * @return An AbstractExpression built from the given string
+     * @throws SyntaxException if there are syntax errors in the input string
+     */
+    public static AbstractExpression getExpressionFromType(String expressionStr, String expressionType) throws SyntaxException {
+        switch (expressionType) {
+            case "ConstantExpression":
+                return new ConstantExpression(Integer.parseInt(expressionStr));
+            case "VariableExpression":
+                String varName = expressionStr.split("=")[0];
+                return new VariableExpression(varName);
+            case "ArithmeticExpression":
+                String rhs = expressionStr;//.split("=")[1];       //crash on print(a+1)
+                Vector<String> postfix = AbstractExpression.infixToPostfix(rhs);
+                return AbstractExpression.buildExpressionFromPostfix(postfix);
+        }
+        return null;
+    }
 }

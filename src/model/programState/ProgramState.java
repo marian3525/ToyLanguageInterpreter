@@ -1,33 +1,42 @@
 package model.programState;
 
 
-import model.adt.FileTable;
-import model.adt.HashMap;
-import model.adt.Stack;
-import model.adt.Vector;
-import model.statement.Statement;
+import model.function.AbstractFunction;
+import model.statement.AbstractStatement;
+import model.util.FileTable;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
+import java.util.Vector;
 
 public class ProgramState {
-    private Stack<Statement> executionStack;
+    private Stack<AbstractStatement> executionStack;
     private Map<String, Integer> symbols;
+    private Map<String, AbstractFunction> functionTable;
     private Vector<String> output;
     private FileTable files;
+    private int lastReturn;
+    private boolean functionFinished;
 
     public ProgramState() {
         executionStack = new Stack<>();
-        symbols = new HashMap<String, Integer>();
+        symbols = new HashMap<>();
+        functionTable = new HashMap<>();
         output = new Vector<>(10);
         files = new FileTable();
     }
 
-    public Stack<Statement> getExecutionStack() {
+    public Stack<AbstractStatement> getExecutionStack() {
         return executionStack;
     }
 
     public Map<String, Integer> getSymbols() {
         return symbols;
+    }
+
+    public Map<String, AbstractFunction> getFunctions() {
+        return functionTable;
     }
 
     public Vector<String> getOutput() {
@@ -38,4 +47,22 @@ public class ProgramState {
         return files;
     }
 
+    /**
+     * @return the return value of the last function call
+     */
+    public int getLastReturn() {
+        return lastReturn;
+    }
+
+    public void setLastReturn(int lastReturn) {
+        this.lastReturn = lastReturn;
+    }
+
+    public boolean getFunctionFinished() {
+        return functionFinished;
+    }
+
+    public void setFunctionFinished(boolean finished) {
+        this.functionFinished = finished;
+    }
 }

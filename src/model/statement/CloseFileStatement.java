@@ -2,17 +2,24 @@ package model.statement;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import model.expression.Expression;
+import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 
 import java.io.IOException;
 
-public class CloseFileStatement extends Statement {
+public class CloseFileStatement extends AbstractStatement {
 
-    private Expression fileId;
+    private AbstractExpression fileId;
+    private String functionName;
 
-    public CloseFileStatement(Expression fileId) {
+    public CloseFileStatement(AbstractExpression fileId) {
         this.fileId = fileId;
+        this.functionName = "main";
+    }
+
+    public CloseFileStatement(AbstractExpression fileId, String functionName) {
+        this.fileId = fileId;
+        this.functionName = functionName;
     }
 
     @Override
@@ -29,5 +36,15 @@ public class CloseFileStatement extends Statement {
         programState.getFiles().getAll().remove(descriptor);
 
         return programState;
+    }
+
+    @Override
+    public String getFunction() {
+        return functionName;
+    }
+
+    @Override
+    public void setFunction(String functionName) {
+        this.functionName = functionName;
     }
 }

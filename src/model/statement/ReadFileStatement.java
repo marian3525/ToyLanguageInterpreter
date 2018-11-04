@@ -2,21 +2,28 @@ package model.statement;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import model.expression.Expression;
+import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class ReadFileStatement extends Statement {
-    private Expression fileId;
+public class ReadFileStatement extends AbstractStatement {
+    private AbstractExpression fileId;
     private String varName;
+    private String functionName;
 
-    public ReadFileStatement(Expression fileId, String varName) {
+    public ReadFileStatement(AbstractExpression fileId, String varName) {
         this.fileId = fileId;
         this.varName = varName;
+        this.functionName = "main";
     }
 
+    public ReadFileStatement(AbstractExpression fileId, String varName, String functionName) {
+        this.fileId = fileId;
+        this.varName = varName;
+        this.functionName = functionName;
+    }
     @Override
     public String toString() {
         return "Read from file: " + fileId + " into var: " + varName;
@@ -48,5 +55,15 @@ public class ReadFileStatement extends Statement {
         //update the symTable
         programState.getSymbols().put(varName, readValue);
         return programState;
+    }
+
+    @Override
+    public String getFunction() {
+        return functionName;
+    }
+
+    @Override
+    public void setFunction(String functionName) {
+        this.functionName = functionName;
     }
 }

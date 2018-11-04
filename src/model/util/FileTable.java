@@ -1,9 +1,10 @@
-package model.adt;
+package model.util;
 
 import javafx.util.Pair;
 import model.interfaces.FileTableInterface;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FileTable implements FileTableInterface {
@@ -23,6 +24,7 @@ public class FileTable implements FileTableInterface {
     @Override
     public int storeFile(String filename, String path) throws IOException {
         descriptor++;
+
         //create the file if it doesn't exist
         File f = new File(path + "\\" + filename);
         if (!f.exists() || f.isDirectory()) {
@@ -48,11 +50,6 @@ public class FileTable implements FileTableInterface {
     @Override
     public Map<Integer, Pair<String, BufferedReader>> getAll() {
         return files;
-    }
-
-    public int getUID() {
-
-        return descriptor;
     }
 
 }

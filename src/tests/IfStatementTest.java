@@ -2,9 +2,9 @@ package tests;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.expression.AbstractExpression;
 import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
-import model.expression.Expression;
 import model.expression.VariableExpression;
 import model.programState.ProgramState;
 import model.statement.*;
@@ -18,16 +18,16 @@ public class IfStatementTest {
 
     @Test
     public void execute() {
-        Expression c1Const = new ConstantExpression(2);
+        AbstractExpression c1Const = new ConstantExpression(2);
         ProgramState state = new ProgramState();
 
         state.getSymbols().put("a", 2);
-        Expression c1Var = new VariableExpression("a");
+        AbstractExpression c1Var = new VariableExpression("a");
 
-        Expression c1Arith = new ArithmeticExpression(new ConstantExpression(1), new VariableExpression("a"), "+");
+        AbstractExpression c1Arith = new ArithmeticExpression(new ConstantExpression(1), new VariableExpression("a"), "+");
 
-        Statement thenStatement = new PrintStatement(new ConstantExpression(3));
-        Statement elseStatement = new PrintStatement(new ConstantExpression(4));
+        AbstractStatement thenStatement = new PrintStatement(new ConstantExpression(3));
+        AbstractStatement elseStatement = new PrintStatement(new ConstantExpression(4));
 
         IfStatement i = new IfStatement(c1Const, thenStatement, elseStatement);
         IfStatement j = new IfStatement(c1Var, thenStatement, elseStatement);

@@ -5,7 +5,7 @@ import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
 
-public class VariableExpression extends Expression {
+public class VariableExpression extends AbstractExpression {
     private String id;
     @RegExp
     public static final String variableRegex = "^([a-zA-Z_]+[a-zA-Z0-9_]*)";

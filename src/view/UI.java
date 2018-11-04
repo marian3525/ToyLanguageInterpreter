@@ -1,4 +1,4 @@
-package view.commandLineInterface;
+package view;
 
 import controller.Controller;
 import exceptions.RepositoryException;
@@ -31,10 +31,16 @@ public class UI {
         b.append("Mini manual: How to use the TPL\n" +
                 "Everything is case sensitive\n" +
                 "Syntax:\n" +
-                "declare a variable: a=1 OR varName=12*7+(1-1) OR a=b (if b is already defined)\n" +
-                "compound statement in one line: a=12+7;b=1+a (the statements will be executed in this order)\n" +
-                "print statement: print(a) OR print(a*9-17*(b+7))\n" +
-                "if statement: if a then print(a) else print(b) (execute then branch if a != 0)");
+                "*declare a variable: a=1 OR varName=12*7+(1-1) OR a=b (if b is already defined)\n" +
+                "*compound statement in one line: a=12+7;b=1+a (the statements will be executed in this order)\n" +
+                "*print statement: print(a) OR print(a*9-17*(b+7))\n" +
+                "*if statement: if a then print(a) else print(b) (execute then branch if a != 0)\n" +
+                "*file operations:\n" +
+                "                  -open a file: openFile(<variable to store the descriptor>, <filename>)\n" +
+                "                              Note: filename doesn't contain \"\n" +
+                "                  -read an integer from a file: readFile(<descriptor>, <var to read into>)\n" +
+                "                  -close a file: closeFile(<descriptor>)\n"
+        );
         System.out.println(b.toString());
     }
 
@@ -146,7 +152,6 @@ public class UI {
             } catch (NullPointerException npe) {
                 System.out.println("Parsing failed: " + npe.getMessage());
             }
-
         }
     }
 
@@ -163,10 +168,10 @@ public class UI {
             System.out.println("Program Exception: " + e.getMessage());
         } catch (UndefinedOperationException e) {
             System.out.println("Undefined Operation: " + e.getMessage());
-        } catch (NullPointerException npe) {
-            System.out.println("Runtime exception: " + npe.getMessage());
         } catch (IOException ioe) {
             System.out.println("IOException: " + ioe.getMessage());
+        } catch (SyntaxException e) {
+            e.printStackTrace();
         }
     }
 
@@ -187,6 +192,8 @@ public class UI {
             System.out.println("Runtime exception: " + npe.getMessage());
         } catch (IOException ioe) {
             System.out.println("IOException: " + ioe.getMessage());
+        } catch (SyntaxException e) {
+            e.printStackTrace();
         }
     }
 }
