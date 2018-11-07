@@ -28,6 +28,11 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
         this.path = path;
     }
 
+    public LoadFunctionFromFileStatement(String functionName) {
+        this.functionName = functionName;
+        this.path = "";
+    }
+
     @Override
     public String toString() {
         return "Load: " + functionName + "from file: " + path;

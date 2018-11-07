@@ -26,32 +26,66 @@ public abstract class AbstractStatement {
      * @param statementStr: statement as string
      * @return Assignment/Compound/If/Print depending on the statement type
      */
-    public static String getStatementType(@NotNull String statementStr) {
+    public static String getStatementType(@NotNull String statementStr) throws SyntaxException {
         String[] aux = statementStr.split("=");
         String[] openAndReadCheck = statementStr.split(",");
-
-        if (statementStr.startsWith("openFile") && openAndReadCheck.length == 2) {
+        //also check if it contains ';'; it might be a compound statement
+        if (statementStr.startsWith("openFile") && openAndReadCheck.length == 2 && !statementStr.contains(";")) {
             return "OpenFileStatement";
         }
-        if (statementStr.startsWith("readFile") && openAndReadCheck.length == 2) {
-            return "ReadFileStatementTest";
+        if (statementStr.startsWith("readFile") && openAndReadCheck.length == 2 && !statementStr.contains(";")) {
+            return "ReadFileStatement";
         }
-        if (statementStr.startsWith("closeFile") && openAndReadCheck.length == 1) {
+        if (statementStr.startsWith("closeFile") && openAndReadCheck.length == 1 && !statementStr.contains(";")) {
             return "CloseFileStatement";
         }
 
         if (aux.length == 2 && !statementStr.contains(";"))
             return "AssignmentStatement";
+
         aux = statementStr.split(";");
         if (aux.length >= 2 && !statementStr.contains("if")) {
             return "CompoundStatement";
-        }
-        if (statementStr.contains("if") && statementStr.contains("then") && statementStr.contains("else")) {
+        } else if (statementStr.contains("if") && statementStr.contains("then") && statementStr.contains("else")) {
             return "IfStatement";
         } else if (statementStr.contains("print(") && statementStr.endsWith(")")) {
             return "PrintStatement";
         }
+
+        if (statementStr.contains("call") && statementStr.contains("(") && statementStr.contains(")")) {
+            return "CallStatement";
+        } else if (statementStr.contains("load") && statementStr.split(" ").length == 2) {
+            return "LoadStatement";
+        } else if (statementStr.contains("return")) {
+            return "ReturnStatement";
+        }
+
+        if (statementStr.contains("new")) {
+            return "newEntryStatement";
+        }
         return null;
+    }
+
+    /**
+     * Call syntax: call <functionName>(arg1, arg2..., argn)
+     *
+     * @param input: statement string
+     * @return the CallStatement built from the string
+     */
+    public static CallStatement getCallStatementFromString(String input) throws SyntaxException {
+        //remove the 'call' and extract the function name and params
+        String functionName;
+        String[] args;
+        CallStatement statement = null;
+        input = input.replace("call ", "");
+        functionName = input.split("\\(")[0];
+        args = input.split("\\(")[1].replace(")", "").replace(" ", "")
+                .split(",");
+        Vector<AbstractStatement> params = new Vector<>();
+        for (String arg : args) {
+            statement = (CallStatement) getStatementFromType(arg, getStatementType(arg));
+        }
+        return statement;
     }
 
     /**
@@ -96,9 +130,69 @@ public abstract class AbstractStatement {
             case "PrintStatement":
                 return getPrintStatementFromString(statement);
             case "IfStatement":
-                break;
+                return getIfStatementFromString(statement);
+            case "OpenFileStatement":
+                return getOpenFileStatementFromString(statement);
+            case "CloseFileStatement":
+                return getCloseFileStatementFromString(statement);
+            case "ReadFileStatement":
+                return getReadFileStatementFromString(statement);
+            case "CallStatement":
+                return getCallStatementFromString(statement);
+            case "LoadStatement":
+                return getLoadFunctionStatementFromString(statement);
+            case "ReturnStatement":
+                return getReturnStatementFromString(statement);
+            case "newEntryStatement":
+                return getNewEntryStatementFromString(statement);
         }
         return null;
+    }
+
+    public static NewEntryStatement getNewEntryStatementFromString(@NotNull String input) throws SyntaxException {
+        String varName;
+        AbstractExpression expr;
+        String[] params = input.replace("new(", "")
+                .replace(")", "")
+                .replace(" ", "").split(",");
+        varName = params[0];
+
+        expr = getExpressionFromType(params[1], getExpressionType(params[1]));
+
+        NewEntryStatement statement = new NewEntryStatement(varName, expr);
+
+        return statement;
+    }
+
+    /**
+     * Syntax: load <functionName>
+     *
+     * @param input
+     * @return
+     */
+    public static LoadFunctionFromFileStatement getLoadFunctionStatementFromString(String input) {
+        String functionName = input.split(" ")[1];
+        LoadFunctionFromFileStatement statement = new LoadFunctionFromFileStatement(functionName);
+        return statement;
+    }
+
+    /**
+     * syntax: return varName or return
+     *
+     * @param input
+     * @return
+     */
+    public static ReturnStatement getReturnStatementFromString(@NotNull String input) throws SyntaxException {
+        ReturnStatement statement = null;
+        if (input.split(" ").length == 1) {
+            //no return varName
+            statement = new ReturnStatement();
+        } else if (input.split(" ").length == 2) {
+            //has return varName
+            statement = new ReturnStatement(AbstractExpression.getExpressionFromType(input.split(" ")[0],
+                    AbstractExpression.getExpressionType(input.split(" ")[0])));
+        }
+        return statement;
     }
 
     /**

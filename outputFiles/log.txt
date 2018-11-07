@@ -1,0 +1,101 @@
+Execution stack:
+(Read from file: var_f into var: var_c;print(var_c))
+if var_c then (Read from file: var_f into var: var_c;print(var_c)) else print(0);
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | 
+Output:
+
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+Read from file: var_f into var: var_c
+print(var_c)
+if var_c then (Read from file: var_f into var: var_c;print(var_c)) else print(0);
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | 
+Output:
+
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+print(var_c)
+if var_c then (Read from file: var_f into var: var_c;print(var_c)) else print(0);
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | var_c --> 3 | 
+Output:
+
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+if var_c then (Read from file: var_f into var: var_c;print(var_c)) else print(0);
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | var_c --> 3 | 
+Output:
+3 | 
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+(Read from file: var_f into var: var_c;print(var_c))
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | var_c --> 3 | 
+Output:
+3 | 
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+Read from file: var_f into var: var_c
+print(var_c)
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | var_c --> 3 | 
+Output:
+3 | 
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+print(var_c)
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | var_c --> 0 | 
+Output:
+3 | 
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+Close file: var_f
+
+Symbol Table:
+var_f --> 1 | var_c --> 0 | 
+Output:
+3 | 0 | 
+File Table:
+1 --> file.txt=java.io.BufferedReader@30f39991 | 
+----------------------------
+Execution stack:
+
+Symbol Table:
+var_f --> 1 | var_c --> 0 | 
+Output:
+3 | 0 | 
+File Table:
+
+----------------------------

@@ -17,12 +17,14 @@ public class CallStatement extends AbstractStatement {
     private Vector<AbstractExpression> args;
     private String returnVar;
 
-    public CallStatement(Vector<AbstractExpression> arguments) {
+    public CallStatement(String functionName, Vector<AbstractExpression> arguments) {
+        this.functionName = functionName;
         this.args = arguments;
         returnVar = "";
     }
 
-    public CallStatement(Vector<AbstractExpression> arguments, String returnVarName) {
+    public CallStatement(String functionName, Vector<AbstractExpression> arguments, String returnVarName) {
+        this.functionName = functionName;
         this.args = arguments;
         returnVar = returnVarName;
     }

@@ -17,6 +17,19 @@ public class ReturnStatement extends AbstractStatement {
         this.value = value;
     }
 
+    public ReturnStatement() {
+
+    }
+
+    public ReturnStatement(AbstractExpression value) {
+        this.value = value;
+    }
+
+    public ReturnStatement(String functionName) {
+        this.functionName = functionName;
+        this.value = null;
+    }
+
     @Override
     public String toString() {
         return "Return from: " + functionName + " with " + value;

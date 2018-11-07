@@ -1,7 +1,9 @@
 package model.programState;
 
 
+import model.adt.Heap;
 import model.function.AbstractFunction;
+import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
 
@@ -16,6 +18,7 @@ public class ProgramState {
     private Map<String, AbstractFunction> functionTable;
     private Vector<String> output;
     private FileTable files;
+    private HeapInterface heap;
     private int lastReturn;
     private boolean functionFinished;
 
@@ -25,6 +28,7 @@ public class ProgramState {
         functionTable = new HashMap<>();
         output = new Vector<>(10);
         files = new FileTable();
+        heap = new Heap();
     }
 
     public Stack<AbstractStatement> getExecutionStack() {
@@ -45,6 +49,10 @@ public class ProgramState {
 
     public FileTable getFiles() {
         return files;
+    }
+
+    public HeapInterface getHeap() {
+        return heap;
     }
 
     /**

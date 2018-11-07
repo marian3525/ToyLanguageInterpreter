@@ -8,10 +8,8 @@ import repository.Repository;
 import repository.RepositoryInterface;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static model.statement.AbstractStatement.*;
 
@@ -31,9 +29,12 @@ public class Controller {
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
     public void step(String progName) throws RepositoryException, UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
-         ProgramState state = repo.getProgramByName(progName);
+        ProgramState state = repo.getProgramByName(progName);
         AbstractStatement top = state.getExecutionStack().pop();
-         top.execute(state);
+        top.execute(state);
+        repo.getProgramByName(progName).getHeap().setContent(gc(
+                repo.getProgramByName(progName).getSymbols().values(),
+                repo.getProgramByName(progName).getHeap().getAll()));
         repo.logProgramState(state);
     }
 
@@ -107,7 +108,7 @@ public class Controller {
                 s = getOpenFileStatementFromString(input);
                 break;
 
-            case "ReadFileStatementTest":
+            case "ReadFileStatement":
                 s = getReadFileStatementFromString(input);
                 break;
         }
@@ -136,5 +137,11 @@ public class Controller {
 
     public FileTable getFiles(String progName) throws RepositoryException {
         return repo.getProgramByName(progName).getFiles();
+    }
+
+    private Map<Integer, Integer> gc(Collection<Integer> symTableValues, Map<Integer, Integer> heap) {
+        return heap.entrySet().stream()
+                .filter(e -> symTableValues.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

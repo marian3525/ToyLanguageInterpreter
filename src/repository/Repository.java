@@ -103,7 +103,7 @@ public class Repository implements RepositoryInterface {
         builder.delete(0, builder.length());    //clear the builder
 
         //print the output vector
-        builder.append("Output:" + System.lineSeparator());
+        builder.append("Output:").append(System.lineSeparator());
         Vector<String> output = state.getOutput();
         for (String out : output) {
             builder.append(out).append(" | ");
@@ -112,10 +112,11 @@ public class Repository implements RepositoryInterface {
         builder.delete(0, builder.length());    //clear the builder
 
         //print the filetable
-        builder.append("File Table:" + System.lineSeparator());
+        builder.append("File Table:").append(System.lineSeparator());
         for (Integer k : state.getFiles().getAll().keySet()) {
             builder.append(k).append(" --> ").append(state.getFiles().getAll().get(k)).append(" | ");
         }
+        builder.append(System.lineSeparator());
         builder.append("----------------------------");
         builder.append(System.lineSeparator());
         logFile.print(builder.toString());
