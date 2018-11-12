@@ -1,5 +1,6 @@
 package model.statement;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
@@ -7,6 +8,9 @@ import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
 
 import java.io.IOException;
+
+import static model.expression.AbstractExpression.getExpressionFromType;
+import static model.expression.AbstractExpression.getExpressionType;
 
 public class PrintStatement extends AbstractStatement {
     private AbstractExpression expression;
@@ -24,13 +28,36 @@ public class PrintStatement extends AbstractStatement {
         this.functionName = functionName;
     }
 
+    /**
+     * Syntax: print(<expr>)
+     *
+     * @param input string representation of a print statement
+     * @return A PrintStatement build from the input string
+     * @throws SyntaxException if the input string is not syntactically valid
+     */
+    public static PrintStatement getPrintStatementFromString(String input) throws SyntaxException {
+        //depending on the parameter, treat each case
+        //syntax: print(a) OR print(a+2*b) OR print(2)
+        //          var         expr            const
+        //extract the expression string
+        AbstractExpression expr = null;
+
+        String param = input.replace("print(", "").replace(")", "").replace(";", "");
+
+        //figure out what kind of expression param is:
+        expr = getExpressionFromType(param, getExpressionType(param));
+
+        PrintStatement s = new PrintStatement(expr);
+        return s;
+    }
+
     @Override
     public String toString() {
         return "print(" + expression.toString() + ")";
     }
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
-        programState.getOutput().add(Integer.toString(expression.evaluate(programState.getSymbols())));
+        programState.getOutput().add(Integer.toString(expression.evaluate(programState.getSymbols(), programState.getHeap())));
         return programState;
     }
 

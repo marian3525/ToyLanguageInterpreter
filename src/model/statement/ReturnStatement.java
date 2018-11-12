@@ -1,9 +1,11 @@
 package model.statement;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -28,6 +30,25 @@ public class ReturnStatement extends AbstractStatement {
     public ReturnStatement(String functionName) {
         this.functionName = functionName;
         this.value = null;
+    }
+
+    /**
+     * syntax: return varName or return
+     *
+     * @param input
+     * @return
+     */
+    static ReturnStatement getReturnStatementFromString(@NotNull String input) throws SyntaxException {
+        ReturnStatement statement = null;
+        if (input.split(" ").length == 1) {
+            //no return varName
+            statement = new ReturnStatement();
+        } else if (input.split(" ").length == 2) {
+            //has return varName
+            statement = new ReturnStatement(AbstractExpression.getExpressionFromType(input.split(" ")[0],
+                    AbstractExpression.getExpressionType(input.split(" ")[0])));
+        }
+        return statement;
     }
 
     @Override

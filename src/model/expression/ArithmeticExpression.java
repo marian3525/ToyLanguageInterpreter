@@ -2,6 +2,7 @@ package model.expression;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.interfaces.HeapInterface;
 
 import java.util.Map;
 
@@ -36,13 +37,16 @@ public class ArithmeticExpression extends AbstractExpression {
     }
 
     @Override
-    public int evaluate(Map<String, Integer> symbols) throws UndefinedOperationException, UndefinedVariableException {
+    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException {
         switch(op) {
-            case "+": return first.evaluate(symbols) + second.evaluate(symbols);
-            case "-": return first.evaluate(symbols) - second.evaluate(symbols);
+            case "+":
+                return first.evaluate(symbols, heap) + second.evaluate(symbols, heap);
+            case "-":
+                return first.evaluate(symbols, heap) - second.evaluate(symbols, heap);
             case "/":
-                return first.evaluate(symbols) / second.evaluate(symbols);
-            case "*": return first.evaluate(symbols) * second.evaluate(symbols);
+                return first.evaluate(symbols, heap) / second.evaluate(symbols, heap);
+            case "*":
+                return first.evaluate(symbols, heap) * second.evaluate(symbols, heap);
         }
         //if it hasn't returned, the op isn't supported, throw an error
         throw new UndefinedOperationException("Unknown operation: " + op);

@@ -29,6 +29,28 @@ public class CallStatement extends AbstractStatement {
         returnVar = returnVarName;
     }
 
+    /**
+     * Call syntax: call <functionName>(arg1, arg2..., argn)
+     *
+     * @param input: statement string
+     * @return the CallStatement built from the string
+     */
+    public static CallStatement getCallStatementFromString(String input) throws SyntaxException {
+        //remove the 'call' and extract the function name and params
+        String functionName;
+        String[] args;
+        CallStatement statement = null;
+        input = input.replace("call ", "");
+        functionName = input.split("\\(")[0];
+        args = input.split("\\(")[1].replace(")", "").replace(" ", "")
+                .split(",");
+        Vector<AbstractStatement> params = new Vector<>();
+        for (String arg : args) {
+            statement = (CallStatement) getStatementFromString(arg);
+        }
+        return statement;
+    }
+
     @Override
     public String toString() {
         return "Call: " + functionName + args.toString();

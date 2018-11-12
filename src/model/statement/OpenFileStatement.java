@@ -26,6 +26,20 @@ public class OpenFileStatement extends AbstractStatement {
         this.functionName = functionName;
     }
 
+    public static OpenFileStatement getOpenFileStatementFromString(String input) {
+        String varName;     //will store the UID of the file, generated in the table insertion
+        String filename;    //the name of the filename to be opened
+        input = input.replace(" ", "");     //delete spaces so that variables don't end up with spaces in them
+
+        String[] params = input.split(",");
+        //extract the varName
+        varName = params[0].replace("openFile(", "");
+        filename = params[1].replace(")", "");
+
+        OpenFileStatement openFileStatement = new OpenFileStatement(varName, filename);
+        return openFileStatement;
+    }
+
     @Override
     public String toString() {
         return "Open file: " + filename;

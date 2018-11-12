@@ -3,6 +3,7 @@ package model.expression;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.interfaces.HeapInterface;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EmptyStackException;
@@ -15,7 +16,29 @@ public abstract class AbstractExpression {
 
     public abstract String toString();
 
-    public abstract int evaluate(Map<String, Integer> symbols) throws UndefinedOperationException, UndefinedVariableException;
+    /**
+     * @param expressionStr  string representation of an expression
+     * @param expressionType type of expression: (constant, variable or arithmetic)
+     * @return An AbstractExpression built from the given string
+     * @throws SyntaxException if there are syntax errors in the input string
+     */
+    public static AbstractExpression getExpressionFromType(String expressionStr, String expressionType) throws SyntaxException {
+        switch (expressionType) {
+            case "ConstantExpression":
+                return new ConstantExpression(Integer.parseInt(expressionStr));
+            case "VariableExpression":
+                String varName = expressionStr.split("=")[0];
+                return new VariableExpression(varName);
+            case "ArithmeticExpression":
+                String rhs = expressionStr;//.split("=")[1];       //crash on print(a+1)
+                Vector<String> postfix = AbstractExpression.infixToPostfix(rhs);
+                return AbstractExpression.buildExpressionFromPostfix(postfix);
+            case "BooleanExpression":
+                //TODO
+                break;
+        }
+        return null;
+    }
 
     /**
      * Split an expression into its elements and put them into a vector. E.g. a+(22-13*b) -> a,+,(,22,-,13,*,b,)
@@ -210,24 +233,5 @@ public abstract class AbstractExpression {
         }
     }
 
-    /**
-     * @param expressionStr  string representation of an expression
-     * @param expressionType type of expression: (constant, variable or arithmetic)
-     * @return An AbstractExpression built from the given string
-     * @throws SyntaxException if there are syntax errors in the input string
-     */
-    public static AbstractExpression getExpressionFromType(String expressionStr, String expressionType) throws SyntaxException {
-        switch (expressionType) {
-            case "ConstantExpression":
-                return new ConstantExpression(Integer.parseInt(expressionStr));
-            case "VariableExpression":
-                String varName = expressionStr.split("=")[0];
-                return new VariableExpression(varName);
-            case "ArithmeticExpression":
-                String rhs = expressionStr;//.split("=")[1];       //crash on print(a+1)
-                Vector<String> postfix = AbstractExpression.infixToPostfix(rhs);
-                return AbstractExpression.buildExpressionFromPostfix(postfix);
-        }
-        return null;
-    }
+    public abstract int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException;
 }

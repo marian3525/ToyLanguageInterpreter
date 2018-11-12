@@ -2,7 +2,7 @@ package controller;
 
 import exceptions.*;
 import model.programState.ProgramState;
-import model.statement.AbstractStatement;
+import model.statement.*;
 import model.util.FileTable;
 import repository.Repository;
 import repository.RepositoryInterface;
@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static model.statement.AbstractStatement.*;
+import static model.statement.AbstractStatement.getStatementType;
 
 public class Controller {
     private RepositoryInterface repo;
@@ -85,31 +85,31 @@ public class Controller {
             return;
         switch (Objects.requireNonNull(getStatementType(input))) {
             case "AssignmentStatement":
-                s = getAssignmentStatementFromString(input);
+                s = AssignmentStatement.getAssignmentStatementFromString(input);
                 break;
 
             case "CompoundStatement":
-                s = getCompoundStatementFromString(input);
+                s = CompoundStatement.getCompoundStatementFromString(input);
                 break;
 
             case "PrintStatement":
-                s = getPrintStatementFromString(input);
+                s = PrintStatement.getPrintStatementFromString(input);
                 break;
 
             case "IfStatement":
-                s = getIfStatementFromString(input);
+                s = IfStatement.getIfStatementFromString(input);
                 break;
 
             case "CloseFileStatement":
-                s = getCloseFileStatementFromString(input);
+                s = CloseFileStatement.getCloseFileStatementFromString(input);
                 break;
 
             case "OpenFileStatement":
-                s = getOpenFileStatementFromString(input);
+                s = OpenFileStatement.getOpenFileStatementFromString(input);
                 break;
 
             case "ReadFileStatement":
-                s = getReadFileStatementFromString(input);
+                s = ReadFileStatement.getReadFileStatementFromString(input);
                 break;
         }
         repo.getProgramByName(progName).getExecutionStack().push(s);

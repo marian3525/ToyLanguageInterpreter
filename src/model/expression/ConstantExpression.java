@@ -1,5 +1,6 @@
 package model.expression;
 
+import model.interfaces.HeapInterface;
 import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ public class ConstantExpression extends AbstractExpression {
     }
 
     @Override
-    public int evaluate(Map<String, Integer> symbols) {
+    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) {
         return value;
     }
 }

@@ -1,6 +1,7 @@
 package model.expression;
 
 import exceptions.UndefinedVariableException;
+import model.interfaces.HeapInterface;
 import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
@@ -20,7 +21,7 @@ public class VariableExpression extends AbstractExpression {
     }
 
     @Override
-    public int evaluate(Map<String, Integer> symbols) throws UndefinedVariableException {
+    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedVariableException {
         if(symbols.containsKey(id))
             return symbols.get(id);
         else

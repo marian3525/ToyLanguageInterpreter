@@ -3,13 +3,18 @@ import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.adt.Heap;
+import model.expression.BooleanExpression;
+import model.expression.ConstantExpression;
+import model.expression.NotExpression;
 import view.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Main {
 
-    private static void runUIExample() throws RepositoryException, SyntaxException, UndefinedVariableException, IOException, UndefinedOperationException {
+    private static void runUIExample() throws RepositoryException, SyntaxException {
         UIByExample ui = new UIByExample();
 
         Controller controller = new Controller();
@@ -42,6 +47,9 @@ public class Main {
     }
 
     public static void main(String[] args) throws SyntaxException, RepositoryException, UndefinedVariableException, IOException, UndefinedOperationException {
-        runUIExample();
+        //runUIExample();
+        BooleanExpression b = new BooleanExpression(new ConstantExpression(1), new ConstantExpression(0), "OR");
+        NotExpression n = new NotExpression(b);
+        System.out.println(n.evaluate(new HashMap<String, Integer>(), new Heap()));
     }
 }

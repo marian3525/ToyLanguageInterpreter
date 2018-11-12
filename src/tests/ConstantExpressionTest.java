@@ -22,7 +22,7 @@ public class ConstantExpressionTest {
         ConstantExpression e = new ConstantExpression(3);
         ConstantExpression e1 = new ConstantExpression(4);
 
-        assert e.evaluate(state.getSymbols()) == 3;
-        assert e1.evaluate(state.getSymbols()) == 4;
+        assert e.evaluate(state.getSymbols(), state.getHeap()) == 3;
+        assert e1.evaluate(state.getSymbols(), state.getHeap()) == 4;
     }
 }

@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -31,6 +30,18 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
     public LoadFunctionFromFileStatement(String functionName) {
         this.functionName = functionName;
         this.path = "";
+    }
+
+    /**
+     * Syntax: load <functionName>
+     *
+     * @param input
+     * @return
+     */
+    static LoadFunctionFromFileStatement getLoadFunctionStatementFromString(String input) {
+        String functionName = input.split(" ")[1];
+        LoadFunctionFromFileStatement statement = new LoadFunctionFromFileStatement(functionName);
+        return statement;
     }
 
     @Override
@@ -84,8 +95,8 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
                     }
 
                     //extract the statement from the line read and add it to the function
-                    AbstractStatement statement = AbstractStatement.getStatementFromType(line,
-                            Objects.requireNonNull(getStatementType(line)));
+                    AbstractStatement statement = AbstractStatement.getStatementFromString(line
+                    );
                     f.addStatement(statement);
                 }
             }

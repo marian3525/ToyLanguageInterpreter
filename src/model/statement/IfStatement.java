@@ -1,5 +1,6 @@
 package model.statement;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
@@ -7,6 +8,9 @@ import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
 
 import java.io.IOException;
+
+import static model.expression.AbstractExpression.getExpressionFromType;
+import static model.expression.AbstractExpression.getExpressionType;
 
 public class IfStatement extends AbstractStatement {
     private AbstractExpression condition;
@@ -31,6 +35,39 @@ public class IfStatement extends AbstractStatement {
         this.functionName = functionName;
     }
 
+    /**
+     * syntax expected: if expr/var/const then statement1 else statement2;
+     * statement1 and statement2 can be compound statements, so don't remove the ; yet
+     *
+     * @param input: if statement string which is syntactically valid
+     * @return an IfStatement parsed from the given string
+     */
+    public static IfStatement getIfStatementFromString(String input) throws SyntaxException {
+        AbstractExpression condition;
+        AbstractStatement thenStatement;
+        AbstractStatement elseStatement;
+        String conditionType;
+        String thenStatementType;
+        String elseStatementType;
+        String[] tokens = input.split(" ");
+
+        //condition at pos. 1
+        // thenStatement at 3
+        // elseStatement at 5
+        conditionType = getExpressionType(tokens[1]);
+        thenStatementType = getStatementType(tokens[3]);
+        //elseStatementType = getStatementType(tokens[5].replace(";", ""));   //it would replace the ;
+        //in compound statements from the else branch as well
+        elseStatementType = getStatementType(tokens[5]);
+
+        condition = getExpressionFromType(tokens[1], conditionType);
+        thenStatement = getStatementFromString(tokens[3]);
+        elseStatement = getStatementFromString(tokens[5]);
+
+        IfStatement ifStatement = new IfStatement(condition, thenStatement, elseStatement);
+        return ifStatement;
+    }
+
     @Override
     public String toString() {
         return "if " + condition.toString() + " then " + thenStatement.toString() + " else " +
@@ -39,7 +76,7 @@ public class IfStatement extends AbstractStatement {
 
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
-        if(condition.evaluate(programState.getSymbols()) != 0) {
+        if (condition.evaluate(programState.getSymbols(), programState.getHeap()) != 0) {
             programState.getExecutionStack().push(thenStatement);
         }
         else {

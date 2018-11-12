@@ -7,6 +7,9 @@ import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -72,5 +75,10 @@ public class ProgramState {
 
     public void setFunctionFinished(boolean finished) {
         this.functionFinished = finished;
+    }
+
+    public void logToFile(String filename) throws IOException {
+        PrintWriter logFile = new PrintWriter(new FileWriter(filename, false));
+        //todo: move printing from repo to programState
     }
 }

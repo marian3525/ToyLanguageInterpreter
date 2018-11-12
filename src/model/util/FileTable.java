@@ -14,7 +14,7 @@ public class FileTable implements FileTableInterface {
     private Map<Integer, Pair<String, BufferedReader>> files;
 
     public FileTable() {
-        files = new HashMap<Integer, Pair<String, BufferedReader>>();
+        files = new HashMap<>();
     }
 
     /**
