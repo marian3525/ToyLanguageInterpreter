@@ -1,6 +1,7 @@
 package controller;
 
 import exceptions.*;
+import model.adt.Heap;
 import model.programState.ProgramState;
 import model.statement.*;
 import model.util.FileTable;
@@ -32,9 +33,11 @@ public class Controller {
         ProgramState state = repo.getProgramByName(progName);
         AbstractStatement top = state.getExecutionStack().pop();
         top.execute(state);
-        repo.getProgramByName(progName).getHeap().setContent(gc(
-                repo.getProgramByName(progName).getSymbols().values(),
-                repo.getProgramByName(progName).getHeap().getAll()));
+        //gc
+        repo.getProgramByName(progName).getHeap().setContent(
+                gc(repo.getProgramByName(progName).getSymbols().values(),
+                        repo.getProgramByName(progName).getHeap().getAll())
+        );
         repo.logProgramState(state);
     }
 
@@ -47,12 +50,20 @@ public class Controller {
      */
     public void run(String progName) throws RepositoryException, UndefinedVariableException, UndefinedOperationException, IOException, SyntaxException {
         ProgramState state = repo.getProgramByName(progName);
+
         while (!state.getExecutionStack().isEmpty()) {
             AbstractStatement top = state.getExecutionStack().pop();
             top.execute(state);
+
+            //gc
+            Collection<Integer> values = state.getSymbols().values();
+            Map<Integer, Integer> all = state.getHeap().getContent();
+
+            Map<Integer, Integer> cleanHeap = gc(values, all);
+            state.getHeap().setContent(cleanHeap);
+
             repo.logProgramState(state);
         }
-
     }
 
     /**
@@ -111,6 +122,11 @@ public class Controller {
             case "ReadFileStatement":
                 s = ReadFileStatement.getReadFileStatementFromString(input);
                 break;
+            case "NewEntryStatement":
+                s = NewHeapEntryStatement.getNewHeapEntryStatementFromString(input);
+                break;
+            case "WriteHeapStatement":
+                s = WriteHeapStatement.getWriteHeapStatementFromString(input);
         }
         repo.getProgramByName(progName).getExecutionStack().push(s);
     }
@@ -139,9 +155,23 @@ public class Controller {
         return repo.getProgramByName(progName).getFiles();
     }
 
+    public Heap getHeap(String progName) throws RepositoryException {
+        return (Heap) repo.getProgramByName(progName).getHeap();
+    }
+
+    /**
+     * Remove the values from the heap which are not referenced by any of the values from the symbols
+     *
+     * @param symTableValues
+     * @param heap
+     * @return
+     */
     private Map<Integer, Integer> gc(Collection<Integer> symTableValues, Map<Integer, Integer> heap) {
-        return heap.entrySet().stream()
+        //symTableValues.contains(heap.get(0));
+
+        Map<Integer, Integer> o = heap.entrySet().stream()
                 .filter(e -> symTableValues.contains(e.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return o;
     }
 }

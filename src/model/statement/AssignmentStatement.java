@@ -27,6 +27,7 @@ public class AssignmentStatement extends AbstractStatement {
     public static final String assignmentRegex= "^[a-zA-Z_]+[a-zA-Z0-9_]*=[+-]?([0]{1}$|[1-9][0-9]*$)";
 
     public AssignmentStatement(String id, AbstractExpression expression) {
+
         this.id = id;
         this.expression = expression;
         this.functionName = "main";

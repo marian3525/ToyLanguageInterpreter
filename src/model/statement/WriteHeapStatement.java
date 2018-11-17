@@ -3,10 +3,9 @@ package model.statement;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import model.adt.Heap;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
-
-import java.io.IOException;
 
 import static model.expression.AbstractExpression.getExpressionFromType;
 import static model.expression.AbstractExpression.getExpressionType;
@@ -27,10 +26,11 @@ public class WriteHeapStatement extends AbstractStatement {
      * @param statement
      * @return
      */
-    static WriteHeapStatement getWriteHeapStatementFromString(String statement) throws SyntaxException {
-        statement = statement.replace("write(", "");
+    public static WriteHeapStatement getWriteHeapStatementFromString(String statement) throws SyntaxException {
+        statement = statement.replace("writeHeap(", "");
         statement = statement.replace(")", "");
         statement = statement.replace(" ", "");
+
         String[] params = statement.split(",");
         String varName = params[0];
 
@@ -47,8 +47,18 @@ public class WriteHeapStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
-        return null;
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
+        Heap h = (Heap) programState.getHeap();
+
+        if (h.get(programState.getSymbols().get(varName)) != null) {
+            // put the value of expression.evaluate() at position given by varName
+            h.put(programState.getSymbols().get(varName), expression.evaluate(
+                    programState.getSymbols(), programState.getHeap()
+            ));
+            programState.getHeap().setContent(h.getContent());
+        } else
+            throw new UndefinedOperationException("Cannot write to address not yet allocated");
+        return programState;
     }
 
     @Override

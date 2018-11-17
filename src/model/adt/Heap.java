@@ -7,9 +7,11 @@ import java.util.Map;
 
 public class Heap implements HeapInterface {
     HashMap<Integer, Integer> data;
+    private int currentIdx;
 
     public Heap() {
         data = new HashMap<>();
+        currentIdx = 0;
     }
 
     @Override
@@ -17,9 +19,22 @@ public class Heap implements HeapInterface {
         return data.get(key);
     }
 
+    /**
+     * Put the value into the value and return the address
+     *
+     * @param value
+     * @return
+     */
     @Override
-    public void put(Integer key, Integer value) {
-        data.put(key, value);
+    public int put(Integer value) {
+        currentIdx++;
+        data.put(currentIdx, value);
+        return currentIdx;
+    }
+
+    @Override
+    public void put(Integer value, Integer addr) {
+        data.put(addr, value);
     }
 
     public Map<Integer, Integer> getAll() {
@@ -28,11 +43,12 @@ public class Heap implements HeapInterface {
 
     @Override
     public Map<Integer, Integer> setContent(Map<Integer, Integer> newContent) {
-        return null;
+        data = (HashMap<Integer, Integer>) newContent;
+        return data;
     }
 
     @Override
     public Map<Integer, Integer> getContent() {
-        return null;
+        return data;
     }
 }

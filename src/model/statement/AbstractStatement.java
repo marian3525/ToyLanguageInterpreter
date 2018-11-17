@@ -18,7 +18,7 @@ public abstract class AbstractStatement {
      * @param statementStr: statement as string
      * @return Assignment/Compound/If/Print depending on the statement type
      */
-    public static String getStatementType(@NotNull String statementStr) throws SyntaxException {
+    public static String getStatementType(@NotNull String statementStr) {
         String[] aux = statementStr.split("=");
         String[] openAndReadCheck = statementStr.split(",");
         //also check if it contains ';'; it might be a compound statement
@@ -53,11 +53,11 @@ public abstract class AbstractStatement {
         }
 
         if (statementStr.contains("new")) {
-            return "newEntryStatement";
+            return "NewEntryStatement";
         } else if (statementStr.contains("readHeap")) {
-            return "readHeapStatement";
+            return "ReadHeapStatement";
         } else if (statementStr.contains("writeHeap")) {
-            return "writeHeapStatement";
+            return "WriteHeapStatement";
         }
         return null;
     }
@@ -67,7 +67,7 @@ public abstract class AbstractStatement {
      * @return A AbstractStatement built from the given string
      * @throws SyntaxException if the input string is has syntactic errors
      */
-    public static AbstractStatement getStatementFromString(String statement) throws SyntaxException {
+    static AbstractStatement getStatementFromString(String statement) throws SyntaxException {
         String statementType = getStatementType(statement);
         switch (Objects.requireNonNull(statementType)) {
             case "AssignmentStatement":
@@ -90,11 +90,9 @@ public abstract class AbstractStatement {
                 return LoadFunctionFromFileStatement.getLoadFunctionStatementFromString(statement);
             case "ReturnStatement":
                 return ReturnStatement.getReturnStatementFromString(statement);
-            case "newEntryStatement":
+            case "NewEntryStatement":
                 return NewHeapEntryStatement.getNewHeapEntryStatementFromString(statement);
-            case "readHeapStatement":
-                return ReadHeapStatement.getReadHeapStatementFromString(statement);
-            case "writeHeapStatement":
+            case "WriteHeapStatement":
                 return WriteHeapStatement.getWriteHeapStatementFromString(statement);
         }
         return null;
@@ -105,4 +103,7 @@ public abstract class AbstractStatement {
     public abstract String getFunction();
 
     public abstract void setFunction(String functionName);
+
+    private void f() {
+    }
 }

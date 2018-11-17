@@ -39,11 +39,20 @@ public class UI {
                 "                  -open a file: openFile(<variable to store the descriptor>, <filename>)\n" +
                 "                              Note: filename doesn't contain \"\n" +
                 "                  -read an integer from a file: readFile(<descriptor>, <var to read into>)\n" +
-                "                  -close a file: closeFile(<descriptor>)\n"
+                "                  -close a file: closeFile(<descriptor>)\n" +
+                "*heap operations: \n" +
+                "                   -new heap entry: new(varName_addr, expr)" +
+                "                   -write to heap: write(varName_addr,expr)" +
+                "                   -read from heap: readHeap(varName_addr)"
         );
         System.out.println(b.toString());
     }
 
+    /**
+     * Print the stack, symbols, output, files and heap
+     *
+     * @param progName
+     */
     private void printInternals(String progName) {
         try {
             System.out.println("Stack:");

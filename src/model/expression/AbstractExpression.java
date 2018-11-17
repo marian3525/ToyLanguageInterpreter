@@ -22,7 +22,8 @@ public abstract class AbstractExpression {
      * @return An AbstractExpression built from the given string
      * @throws SyntaxException if there are syntax errors in the input string
      */
-    public static AbstractExpression getExpressionFromType(String expressionStr, String expressionType) throws SyntaxException {
+    public static AbstractExpression getExpressionFromType(String expressionStr, String expressionType)
+            throws SyntaxException {
         switch (expressionType) {
             case "ConstantExpression":
                 return new ConstantExpression(Integer.parseInt(expressionStr));
@@ -36,13 +37,17 @@ public abstract class AbstractExpression {
             case "BooleanExpression":
                 //TODO
                 break;
+            case "ReadHeapExpression":
+                //already defined?
+                varName = expressionStr.split("\\(")[1].replace(")", "");
+                return new ReadHeapExpression(varName);
         }
         return null;
     }
 
     /**
      * Split an expression into its elements and put them into a vector. E.g. a+(22-13*b) -> a,+,(,22,-,13,*,b,)
-     *
+     * If function calls are included, they should have the syntax: <functionName>(params1, param2...paramn)
      * @param in: string work with
      * @return Vector containing the variables, constants and operators from the input string
      */
@@ -54,6 +59,7 @@ public abstract class AbstractExpression {
         //add a space at the end of the string so that next doesn't go out of bounds
         in = in.concat(" ");
 
+        //go over the string with current and next = current+1
         for (int i = 0; i < in.length()-1; i++) {
             char current = in.charAt(i);
             char next = in.charAt(i + 1);
@@ -64,11 +70,23 @@ public abstract class AbstractExpression {
             else if("+-*/".contains(String.valueOf(current))) {
                 out.add(String.valueOf(current));
             }
-            //if a letter, start building a var name
+            //if a letter, start building a var name OR FUNCTION NAME!
             else if (Character.isLetterOrDigit(current) && nameBuilder.length() > 0 || Character.isLetter(current)) {
                     nameBuilder.append(current);
                     if (!Character.isLetterOrDigit(next)) {
-                        //end of var name, build the String
+                        //end of var name
+                        //check if it a function by checking for '('
+                        //if a '(' follows a char, it must be a function name
+                        if (next == '(') {
+                            //it is a function, get the params and add them to the end of the function
+                            while (current != ')') {
+
+                                i++;
+                                current = in.charAt(i);
+
+                                nameBuilder.append(current);
+                            }
+                        }
                         //nameBuilder.append(next);
                         out.add(nameBuilder.toString());
                         nameBuilder.delete(0, nameBuilder.length());
@@ -95,8 +113,7 @@ public abstract class AbstractExpression {
     public static Vector<String> infixToPostfix(String input) throws SyntaxException {
         Stack<String> stack = new Stack<>();
         Vector<String> output = new Vector<>(10);
-        // initializing empty String for result
-        String result = "";
+
         //convert the input string into a vector of variables and constants
         Vector<String> in = tokenize(input);
 
@@ -105,8 +122,10 @@ public abstract class AbstractExpression {
 
             // If the scanned character is an operand, add it to output.
             if (Character.isLetterOrDigit(c.charAt(0)))
-                output.add(String.valueOf(c));
-
+                output.add(c);
+                //if it is a function call, add the string
+            else if (c.matches(ReadHeapExpression.readHeapExpressionRegex))
+                output.add(c);
                 // If the scanned character is an '(', push it to the stack.
             else if (c.equals("("))
                 stack.push(c);
@@ -167,7 +186,7 @@ public abstract class AbstractExpression {
      * @param postfix : Vector of strings representing token of the expression in postfix notation
      * @return An AbstractExpression built from the postfix expression
      */
-    public static ArithmeticExpression buildExpressionFromPostfix(Vector<String> postfix) {
+    public static ArithmeticExpression buildExpressionFromPostfix(Vector<String> postfix) throws SyntaxException {
         Stack<AbstractExpression> stack = new Stack<>();
 
         for (String tok : postfix) {
@@ -185,7 +204,7 @@ public abstract class AbstractExpression {
                     second = stack.pop();
                     first = stack.pop();
                 } catch (EmptyStackException e) {
-                    //throw new ProgramException("Error parsing expressin");
+                    //throw new ProgramException("Error parsing expression");
                 }
                 AbstractExpression combined = new ArithmeticExpression(first, second, tok);
                 stack.push(combined);
@@ -203,7 +222,7 @@ public abstract class AbstractExpression {
      * @param tok a token string
      * @return AbstractExpression built from the string
      */
-    private static AbstractExpression convertStringToExpression(String tok) {
+    private static AbstractExpression convertStringToExpression(String tok) throws SyntaxException {
         //if it contains letters, it must be a variable with tok as name
         AbstractExpression output = null;
         if (tok.matches("[a-z]*")) {
@@ -212,12 +231,16 @@ public abstract class AbstractExpression {
         //if it is a constant value
         else if (tok.matches("[1-9][0-9]*")) {
             output = new ConstantExpression(Integer.parseInt(tok));
+        } else if (tok.matches(ReadHeapExpression.readHeapExpressionRegex)) {
+            output = ReadHeapExpression.getExpressionFromType(tok, ReadHeapExpression.getExpressionType(tok));
         }
         return output;
     }
 
     /**
-     * Find the type of expression which fits the given semantics
+     * Find the type of expression which fits the given semantics.
+     * !!!Order is critical
+     * 1+readHeap(a) must be evaluated as arithmetic expression, not ReadHeapExpression
      *
      * @param expression: expression whose type needs to be identified
      * @return: the type of expression as class
@@ -228,9 +251,13 @@ public abstract class AbstractExpression {
             return "ConstantExpression";
         } else if (expression.matches(VariableExpression.variableRegex)) {
             return "VariableExpression";
-        } else {
+        } else if (expression.matches(ReadHeapExpression.readHeapExpressionRegex)) {
+            return "ReadHeapExpression";
+        } else if (expression.contains("+") || expression.contains("-") ||
+                expression.contains("*") || expression.contains("/")) {
             return "ArithmeticExpression";
         }
+        return null;
     }
 
     public abstract int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException;

@@ -81,47 +81,80 @@ public class Repository implements RepositoryInterface {
     @Override
     public void logProgramState(ProgramState state) throws IOException {
         PrintWriter logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
-        //print the executionStack
+        String[] keys = {"stack", "symbols", "output", "files", "heap"};
+        Map<String, String> stringMap = getStrings(state);
+
+        for (String key : keys) {
+            logFile.print(stringMap.get(key));
+            logFile.println("--------------------------------------------------");
+        }
+        logFile.close();
+    }
+
+    /**
+     * Build a map containing the string representation of the internal state.
+     * map.get("stack") will store the content of the stack etc
+     *
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, String> getStrings(ProgramState state) {
+        Map<String, String> stringMap = new HashMap<>();
+        String stackString, outputString, symbolsString, filesString, heapString;
         Stack<AbstractStatement> s = (Stack<AbstractStatement>) state.getExecutionStack().clone();
+
+        //build each string with a builder
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Execution stack:" + System.lineSeparator());
+        //stack string
+        builder.append("Execution stack:").append(System.lineSeparator());
         while (!s.isEmpty()) {
             builder.append(s.peek()).append(System.lineSeparator());
             s.pop();
         }
-        logFile.println(builder.toString());
-        builder.delete(0, builder.length());    //clear the builder
+        stackString = builder.toString();
+        builder.delete(0, builder.length());
 
-        //print the symbol table
-        builder.append("Symbol Table:" + System.lineSeparator());
-        HashMap<String, Integer> symTable = (HashMap<String, Integer>) state.getSymbols();
-        for (Object key : symTable.keySet()) {
-            builder.append((String) key).append(" --> ").append(symTable.get(key).toString()).append(" | ");
-        }
-        logFile.println(builder.toString());
-        builder.delete(0, builder.length());    //clear the builder
-
-        //print the output vector
+        //output string
         builder.append("Output:").append(System.lineSeparator());
         Vector<String> output = state.getOutput();
         for (String out : output) {
             builder.append(out).append(" | ");
         }
-        logFile.println(builder.toString());
+        outputString = builder.toString();
         builder.delete(0, builder.length());    //clear the builder
 
-        //print the filetable
+        //symbol table
+        builder.append("Symbol Table:").append(System.lineSeparator());
+        HashMap<String, Integer> symTable = (HashMap<String, Integer>) state.getSymbols();
+        for (Object key : symTable.keySet()) {
+            builder.append((String) key).append(" --> ").append(symTable.get(key).toString()).append(" | ");
+        }
+        symbolsString = builder.toString();
+        builder.delete(0, builder.length());    //clear the builder
+
+        //filetable
         builder.append("File Table:").append(System.lineSeparator());
         for (Integer k : state.getFiles().getAll().keySet()) {
             builder.append(k).append(" --> ").append(state.getFiles().getAll().get(k)).append(" | ");
         }
-        builder.append(System.lineSeparator());
-        builder.append("----------------------------");
-        builder.append(System.lineSeparator());
-        logFile.print(builder.toString());
-
+        filesString = builder.toString();
         builder.delete(0, builder.length());    //clear the builder
-        logFile.close();
+
+        //heap
+        builder.append("Heap:").append(System.lineSeparator());
+        for (Integer k : state.getHeap().getAll().keySet()) {
+            builder.append(k).append("-->").append(state.getHeap().get(k)).append(System.lineSeparator());
+        }
+        heapString = builder.toString();
+
+        stringMap.put("output", outputString);
+        stringMap.put("stack", stackString);
+        stringMap.put("symbols", symbolsString);
+        stringMap.put("files", filesString);
+        stringMap.put("heap", heapString);
+
+        return stringMap;
     }
 }

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class ControllerTest {
     Controller c;
@@ -59,6 +60,27 @@ public class ControllerTest {
         assert controller.getStackString("test").size() != 0;
         controller.step("test");
         assert(controller.getSymbols("test").get("c") == 272);
+    }
+
+    @Test
+    public void testGc() throws SyntaxException, RepositoryException, UndefinedVariableException, IOException, UndefinedOperationException {
+        c.addEmptyProgram("test1");
+
+        c.addStatementString("a=1", "test1");
+        c.addStatementString("new(a, 10)", "test1");
+        c.addStatementString("a=0", "test1");
+        c.run("test1");
+
+        //a is 1, the addr of the insert is 1, should not get gc'ed
+        Map<Integer, Integer> heap = c.getHeap("test1").getAll();
+        assert heap.size() == 1;
+        assert heap.get(1) == 10;
+        assert heap.get(2) == null;
+
+        c.addStatementString("a=10", "test1");
+        c.run("test1");
+        heap = c.getHeap("test1").getAll();
+        assert heap.size() == 0;
     }
 
     @Test

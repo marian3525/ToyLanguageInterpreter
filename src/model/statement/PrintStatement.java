@@ -41,8 +41,8 @@ public class PrintStatement extends AbstractStatement {
         //          var         expr            const
         //extract the expression string
         AbstractExpression expr = null;
-
-        String param = input.replace("print(", "").replace(")", "").replace(";", "");
+        //replace all instead of replace so that a regex is used to replace only the last ')' from the print
+        String param = input.replace("print(", "").replaceAll("\\)$", "").replace(";", "");
 
         //figure out what kind of expression param is:
         expr = getExpressionFromType(param, getExpressionType(param));
