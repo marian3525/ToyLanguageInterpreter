@@ -1,10 +1,7 @@
 package tests;
 
 import controller.Controller;
-import exceptions.RepositoryException;
-import exceptions.SyntaxException;
-import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
+import exceptions.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +22,7 @@ public class ControllerTest {
     }
 
     @Test
-    public void step() throws UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException, IOException {
+    public void step() throws UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException, IOException, ProgramException {
         Controller controller = new Controller();
         controller.addEmptyProgram("test");
 

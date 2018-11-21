@@ -1,13 +1,10 @@
 package model.statement;
 
 import exceptions.SyntaxException;
-import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
+import parsers.ExpressionParser;
 
 public class ReturnStatement extends AbstractStatement {
 
@@ -38,15 +35,15 @@ public class ReturnStatement extends AbstractStatement {
      * @param input
      * @return
      */
-    static ReturnStatement getReturnStatementFromString(@NotNull String input) throws SyntaxException {
+    public static ReturnStatement getReturnStatementFromString(@NotNull String input) throws SyntaxException {
         ReturnStatement statement = null;
         if (input.split(" ").length == 1) {
             //no return varName
             statement = new ReturnStatement();
         } else if (input.split(" ").length == 2) {
             //has return varName
-            statement = new ReturnStatement(AbstractExpression.getExpressionFromType(input.split(" ")[0],
-                    AbstractExpression.getExpressionType(input.split(" ")[0])));
+            statement = new ReturnStatement(ExpressionParser.getExpressionFromString(input.split(" ")[0]
+            ));
         }
         return statement;
     }
@@ -57,7 +54,7 @@ public class ReturnStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(ProgramState programState) {
         //flag the end of the execution
         programState.setFunctionFinished(true);
         return programState;

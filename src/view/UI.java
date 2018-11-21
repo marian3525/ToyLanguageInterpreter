@@ -1,10 +1,7 @@
 package view;
 
 import controller.Controller;
-import exceptions.RepositoryException;
-import exceptions.SyntaxException;
-import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
+import exceptions.*;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -41,9 +38,10 @@ public class UI {
                 "                  -read an integer from a file: readFile(<descriptor>, <var to read into>)\n" +
                 "                  -close a file: closeFile(<descriptor>)\n" +
                 "*heap operations: \n" +
-                "                   -new heap entry: new(varName_addr, expr)" +
-                "                   -write to heap: write(varName_addr,expr)" +
-                "                   -read from heap: readHeap(varName_addr)"
+                "                   -new heap entry: new(varName_addr, expr)\n" +
+                "                   -write to heap: write(varName_addr,expr)\n" +
+                "                   -read from heap: readHeap(varName_addr)\n" +
+                "*while statement: while(expr): statement1;statement2"
         );
         System.out.println(b.toString());
     }
@@ -77,6 +75,23 @@ public class UI {
             }
         } catch (RepositoryException e) {
             System.out.println(e.toString());
+        }
+        try {
+            System.out.println("\nHeap:");
+            for (Integer key : controller.getHeap(progName).getAll().keySet()) {
+                System.out.println("Addr: " + key + " --> value: " + controller.getHeap(progName).getAll().get(key));
+            }
+        } catch (RepositoryException e) {
+
+        }
+        try {
+            System.out.println("\nFiles:");
+            for (Integer key : controller.getFiles(progName).getAll().keySet()) {
+                System.out.println("Descriptor: " + key + " --> filename:" + controller.getFiles(progName).
+                        getAll().get(key).getKey());
+            }
+        } catch (RepositoryException e) {
+
         }
     }
 
@@ -202,6 +217,8 @@ public class UI {
         } catch (IOException ioe) {
             System.out.println("IOException: " + ioe.getMessage());
         } catch (SyntaxException e) {
+            e.printStackTrace();
+        } catch (ProgramException e) {
             e.printStackTrace();
         }
     }

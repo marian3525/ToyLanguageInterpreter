@@ -17,7 +17,7 @@ public class IfStatementTest {
     }
 
     @Test
-    public void execute() {
+    public void testExecute() {
         AbstractExpression c1Const = new ConstantExpression(2);
         ProgramState state = new ProgramState();
 

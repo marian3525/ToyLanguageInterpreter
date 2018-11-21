@@ -5,12 +5,10 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import parsers.ExpressionParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
 
 public class ReadFileStatement extends AbstractStatement {
     private AbstractExpression fileId;
@@ -40,8 +38,7 @@ public class ReadFileStatement extends AbstractStatement {
         fileIdStr = params[0].replace("readFile(", "");
         varName = params[1].replace(")", "");
 
-        String exprType = getExpressionType(fileIdStr);
-        fileId = getExpressionFromType(fileIdStr, exprType);
+        fileId = ExpressionParser.getExpressionFromString(fileIdStr);
         ReadFileStatement readFileStatement = new ReadFileStatement(fileId, varName);
         return readFileStatement;
     }

@@ -6,6 +6,7 @@ import model.expression.AbstractExpression;
 import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
 import org.junit.Test;
+import parsers.ExpressionParser;
 
 import java.util.Vector;
 
@@ -29,12 +30,12 @@ public class AbstractExpressionTest {
         expected.add("v3");
         expected.add(")");
         //assert(false);
-        assertArrayEquals(expected.toArray(), AbstractExpression.tokenize(expr).toArray());
+        assertArrayEquals(expected.toArray(), ExpressionParser.tokenize(expr).toArray());
 
         String input = "32*(1+readHeap(varName))*3";
         String[] toks = {"32", "*", "(", "1", "+", "readHeap(varName)", ")", "*", "3"};
 
-        Vector<String> tok = AbstractExpression.tokenize(input);
+        Vector<String> tok = ExpressionParser.tokenize(input);
         for (int i = 0; i < toks.length; i++) {
             assert toks[i].equals(tok.elementAt(i));
         }
@@ -43,35 +44,35 @@ public class AbstractExpressionTest {
     public void infixToPostfixTest() {
         String infix = "2*3-8/2";
         try {
-            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
+            Vector<String> postfix = ExpressionParser.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"2","3","*","8","2","/","-"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "2*3-8";
         try {
-            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
+            Vector<String> postfix = ExpressionParser.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"2","3","*","8","-"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "2*(3-8)";
         try {
-            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
+            Vector<String> postfix = ExpressionParser.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"2", "3", "8", "-", "*"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "21*(30-8)";
         try {
-            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
+            Vector<String> postfix = ExpressionParser.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"21", "30", "8", "-", "*"});
         } catch (SyntaxException e) {
             assert(false);
         }
         infix = "21*(30-8*readHeap(varName))";
         try {
-            Vector<String> postfix = AbstractExpression.infixToPostfix(infix);
+            Vector<String> postfix = ExpressionParser.infixToPostfix(infix);
             assertArrayEquals(postfix.toArray(), new String[]{"21", "30", "8", "readHeap(varName)", "*", "-", "*"});
         } catch (SyntaxException e) {
             assert (false);
@@ -92,11 +93,11 @@ public class AbstractExpressionTest {
         postfix1.add("4");
         postfix1.add("*");
         postfix1.add("+");
-        Vector<String> postfix2 = AbstractExpression.infixToPostfix("2+(3+2*8)/2");
+        Vector<String> postfix2 = ExpressionParser.infixToPostfix("2+(3+2*8)/2");
 
-        AbstractExpression e1 = AbstractExpression.buildExpressionFromPostfix(postfix1);
+        AbstractExpression e1 = ExpressionParser.buildExpressionFromPostfix(postfix1);
         AbstractExpression e2;
-        e2 = AbstractExpression.buildExpressionFromPostfix(postfix2);
+        e2 = ExpressionParser.buildExpressionFromPostfix(postfix2);
 
 
         AbstractExpression e1ShouldBe = new ArithmeticExpression(new ConstantExpression(2), new ArithmeticExpression

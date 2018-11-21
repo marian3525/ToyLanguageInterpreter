@@ -2,10 +2,8 @@ package model.statement;
 
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
 import model.programState.ProgramState;
-
-import java.io.IOException;
+import parsers.StatementParser;
 
 public class CompoundStatement extends AbstractStatement {
     private AbstractStatement first;
@@ -38,21 +36,19 @@ public class CompoundStatement extends AbstractStatement {
         //should result in 2 strings
         String first = sides[0];
         String second = sides[1];
-        String firstType = getStatementType(first);
-        String secondType = getStatementType(second);
 
         AbstractStatement firstStatement;
         AbstractStatement secondStatement;
 
-        firstStatement = getStatementFromString(first);
-        secondStatement = getStatementFromString(second);
+        firstStatement = StatementParser.getStatementFromString(first);
+        secondStatement = StatementParser.getStatementFromString(second);
 
         CompoundStatement s = new CompoundStatement(firstStatement, secondStatement);
         return s;
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException {
         programState.getExecutionStack().push(second);
         programState.getExecutionStack().push(first);
         return programState;

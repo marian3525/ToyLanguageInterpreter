@@ -1,11 +1,10 @@
 package model.statement;
 
 import exceptions.SyntaxException;
-import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
 import javafx.util.Pair;
 import model.function.Function;
 import model.programState.ProgramState;
+import parsers.StatementParser;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -38,7 +37,7 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
      * @param input
      * @return
      */
-    static LoadFunctionFromFileStatement getLoadFunctionStatementFromString(String input) {
+    public static LoadFunctionFromFileStatement getLoadFunctionStatementFromString(String input) {
         String functionName = input.split(" ")[1];
         LoadFunctionFromFileStatement statement = new LoadFunctionFromFileStatement(functionName);
         return statement;
@@ -55,12 +54,10 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
      *
      * @param programState the current program state
      * @return the modified program state
-     * @throws UndefinedOperationException
-     * @throws UndefinedVariableException
      * @throws IOException
      */
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
+    public ProgramState execute(ProgramState programState) throws IOException, SyntaxException {
         //check if the file was already opened with an OpenFileStatement
         String line;
         BufferedReader reader = null;
@@ -95,8 +92,7 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
                     }
 
                     //extract the statement from the line read and add it to the function
-                    AbstractStatement statement = AbstractStatement.getStatementFromString(line
-                    );
+                    AbstractStatement statement = StatementParser.getStatementFromString(line);
                     f.addStatement(statement);
                 }
             }

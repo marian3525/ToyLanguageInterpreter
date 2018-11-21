@@ -3,11 +3,14 @@ package model.expression;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.interfaces.HeapInterface;
+import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
 
 public class NotExpression extends AbstractExpression {
 
+    @RegExp
+    public static final String notRegex = "not\\(.*\\)$";
     private AbstractExpression expression;
 
     public NotExpression(AbstractExpression expression) {

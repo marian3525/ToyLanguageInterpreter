@@ -6,11 +6,9 @@ import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
+import parsers.ExpressionParser;
 
 import java.io.IOException;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
 
 public class PrintStatement extends AbstractStatement {
     private AbstractExpression expression;
@@ -43,9 +41,10 @@ public class PrintStatement extends AbstractStatement {
         AbstractExpression expr = null;
         //replace all instead of replace so that a regex is used to replace only the last ')' from the print
         String param = input.replace("print(", "").replaceAll("\\)$", "").replace(";", "");
-
+        //added so the param wouldn't have a space in front of it in print(i)
+        param = param.replace(" ", "");
         //figure out what kind of expression param is:
-        expr = getExpressionFromType(param, getExpressionType(param));
+        expr = ExpressionParser.getExpressionFromString(param);
 
         PrintStatement s = new PrintStatement(expr);
         return s;

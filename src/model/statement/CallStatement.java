@@ -6,6 +6,7 @@ import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.function.Function;
 import model.programState.ProgramState;
+import parsers.StatementParser;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,6 +35,7 @@ public class CallStatement extends AbstractStatement {
      *
      * @param input: statement string
      * @return the CallStatement built from the string
+     * todo: might not belong in this class
      */
     public static CallStatement getCallStatementFromString(String input) throws SyntaxException {
         //remove the 'call' and extract the function name and params
@@ -46,7 +48,7 @@ public class CallStatement extends AbstractStatement {
                 .split(",");
         Vector<AbstractStatement> params = new Vector<>();
         for (String arg : args) {
-            statement = (CallStatement) getStatementFromString(arg);
+            statement = (CallStatement) StatementParser.getStatementFromString(arg);
         }
         return statement;
     }

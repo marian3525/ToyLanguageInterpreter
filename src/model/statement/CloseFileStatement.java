@@ -5,11 +5,9 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import parsers.ExpressionParser;
 
 import java.io.IOException;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
 
 public class CloseFileStatement extends AbstractStatement {
 
@@ -26,13 +24,17 @@ public class CloseFileStatement extends AbstractStatement {
         this.functionName = functionName;
     }
 
+    /**
+     * Expected syntax closeFile(fileIdExpr)
+     *
+     * @param input
+     * @return
+     * @throws SyntaxException
+     */
     public static CloseFileStatement getCloseFileStatementFromString(String input) throws SyntaxException {
-        AbstractExpression fileIdExpression;
-
         String fileId = input.replace("closeFile(", "").replace(")", "");
-        String expressionType = getExpressionType(fileId);
 
-        fileIdExpression = getExpressionFromType(fileId, expressionType);
+        AbstractExpression fileIdExpression = ExpressionParser.getExpressionFromString(fileId);
 
         CloseFileStatement closeFileStatement = new CloseFileStatement(fileIdExpression);
         return closeFileStatement;

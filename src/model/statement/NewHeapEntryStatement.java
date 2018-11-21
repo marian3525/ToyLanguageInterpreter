@@ -6,9 +6,7 @@ import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 import org.jetbrains.annotations.NotNull;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
+import parsers.ExpressionParser;
 
 public class NewHeapEntryStatement extends AbstractStatement {
 
@@ -36,25 +34,12 @@ public class NewHeapEntryStatement extends AbstractStatement {
                 .replace(" ", "").split(",");
         varName = params[0];
 
-        expr = getExpressionFromType(params[1], getExpressionType(params[1]));
+        expr = ExpressionParser.getExpressionFromString(params[1]);
         NewHeapEntryStatement statement = new NewHeapEntryStatement(varName, expr);
 
         return statement;
     }
 
-    @Override
-    public String toString() {
-        return "new(" + varName + "," + expression.toString() + ")";
-    }
-
-    /**
-     * Allocate a space in the heap, put the value of expr in the space and return the address of it
-     *
-     * @param programState
-     * @return
-     * @throws UndefinedOperationException
-     * @throws UndefinedVariableException
-     */
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
         int value = expression.evaluate(programState.getSymbols(), programState.getHeap());
@@ -74,4 +59,19 @@ public class NewHeapEntryStatement extends AbstractStatement {
     public void setFunction(String functionName) {
         this.functionName = functionName;
     }
+
+    @Override
+    public String toString() {
+        return "new(" + varName + "," + expression.toString() + ")";
+    }
+
+    /**
+     * Allocate a space in the heap, put the value of expr in the space and return the address of it
+     *
+     * @param programState
+     * @return
+     * @throws UndefinedOperationException
+     * @throws UndefinedVariableException
+     */
+
 }

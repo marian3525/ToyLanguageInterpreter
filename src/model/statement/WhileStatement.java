@@ -5,11 +5,8 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
-
-import java.io.IOException;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
+import parsers.ExpressionParser;
+import parsers.StatementParser;
 
 public class WhileStatement extends AbstractStatement {
     private AbstractExpression condition;
@@ -36,10 +33,10 @@ public class WhileStatement extends AbstractStatement {
         //while(condition): statement
         String[] aux = input.split("\\):");
         String condStr = aux[0].replace(" ", "").replace("while(", "");
-        String statementStr = aux[1];
+        String statementStr = aux[1].replace(" ", "");
 
-        condition = getExpressionFromType(condStr, getExpressionType(condStr));
-        statement = getStatementFromString(statementStr);
+        condition = ExpressionParser.getExpressionFromString(condStr);
+        statement = StatementParser.getStatementFromString(statementStr);
 
         WhileStatement whileStatement = new WhileStatement(condition, statement);
         return whileStatement;
@@ -47,7 +44,7 @@ public class WhileStatement extends AbstractStatement {
 
     @Override
     public String toString() {
-        return null;
+        return "while(" + condition.toString() + "): " + statement.toString();
     }
 
     /**
@@ -57,16 +54,16 @@ public class WhileStatement extends AbstractStatement {
      * @return
      * @throws UndefinedOperationException
      * @throws UndefinedVariableException
-     * @throws IOException
-     * @throws SyntaxException
      */
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
         if (condition.evaluate(programState.getSymbols(), programState.getHeap()) == 0) {
             //condition is false, don't add the statement to the stack
             //the while statement will be popped after this call to execute does nothing
+
         } else {
             //condition is true, push a statement onto the stack
+            programState.getExecutionStack().push(this);
             programState.getExecutionStack().push(statement);
         }
         return programState;

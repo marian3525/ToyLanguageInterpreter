@@ -6,9 +6,7 @@ import exceptions.UndefinedVariableException;
 import model.adt.Heap;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
+import parsers.ExpressionParser;
 
 public class WriteHeapStatement extends AbstractStatement {
     private String varName;
@@ -35,7 +33,7 @@ public class WriteHeapStatement extends AbstractStatement {
         String varName = params[0];
 
         String exprString = params[1];
-        AbstractExpression expr = getExpressionFromType(exprString, getExpressionType(exprString));
+        AbstractExpression expr = ExpressionParser.getExpressionFromString(exprString);
 
         WriteHeapStatement writeHeapStatement = new WriteHeapStatement(varName, expr);
         return writeHeapStatement;

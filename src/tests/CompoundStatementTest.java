@@ -21,12 +21,8 @@ public class CompoundStatementTest {
 
         try {
             s.execute(state);
-        } catch (exceptions.UndefinedOperationException e) {
-            e.printStackTrace();
-        } catch (exceptions.UndefinedVariableException e) {
-            e.printStackTrace();
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
+        } catch (exceptions.UndefinedOperationException | exceptions.UndefinedVariableException | java.io.IOException e) {
+            assert false;
         }
 
         assert state.getExecutionStack().peek() == first;

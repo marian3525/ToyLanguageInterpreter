@@ -5,21 +5,21 @@ import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.IOException;
 
-class ReadHeapExpressionTest {
+public class ReadHeapExpressionTest {
     Controller c;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         c = new Controller();
     }
 
     @Test
-    void testEvaluate() throws RepositoryException, SyntaxException, UndefinedVariableException, IOException, UndefinedOperationException {
+    public void testEvaluate() throws RepositoryException, SyntaxException, UndefinedVariableException, IOException, UndefinedOperationException {
         c.addEmptyProgram("test");
         c.addStatementString("print(1+readHeap(a))", "test");
         c.addStatementString("new(a, 10)", "test");

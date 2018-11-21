@@ -6,11 +6,10 @@ import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
+import parsers.ExpressionParser;
+import parsers.StatementParser;
 
 import java.io.IOException;
-
-import static model.expression.AbstractExpression.getExpressionFromType;
-import static model.expression.AbstractExpression.getExpressionType;
 
 public class IfStatement extends AbstractStatement {
     private AbstractExpression condition;
@@ -54,15 +53,12 @@ public class IfStatement extends AbstractStatement {
         //condition at pos. 1
         // thenStatement at 3
         // elseStatement at 5
-        conditionType = getExpressionType(tokens[1]);
-        thenStatementType = getStatementType(tokens[3]);
         //elseStatementType = getStatementType(tokens[5].replace(";", ""));   //it would replace the ;
         //in compound statements from the else branch as well
-        elseStatementType = getStatementType(tokens[5]);
 
-        condition = getExpressionFromType(tokens[1], conditionType);
-        thenStatement = getStatementFromString(tokens[3]);
-        elseStatement = getStatementFromString(tokens[5]);
+        condition = ExpressionParser.getExpressionFromString(tokens[1]);
+        thenStatement = StatementParser.getStatementFromString(tokens[3]);
+        elseStatement = StatementParser.getStatementFromString(tokens[5]);
 
         IfStatement ifStatement = new IfStatement(condition, thenStatement, elseStatement);
         return ifStatement;
