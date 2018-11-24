@@ -34,7 +34,7 @@ Example: <br>
 Syntax: 
 	<code>openFile(descriptorVariableName, filename)</code><br>
 	Note: filename does not contain spaces or ""<br>
-Example:
+Example:<br>
 	<code>openFile(desc, file.txt)</code><br>
 	
 # -read file statements
@@ -50,9 +50,9 @@ Example (after having opened the file):<br>
 
 # -allocate space into the heap
 	Syntax:
-		<code>new(varHeapPtr, initValueExpr)<code><br>
+		<code>new(varHeapPtr, initValueExpr)</code><br>
 	Example:<br>
-		<code>new(ptr, 11)</code>. Now at address <code>ptr</code> value 11 is stored
+		<code>new(ptr, 11)</code>. Now at address ptr value 11 is stored<br>
 # -read from the heap
 	Syntax:
 		<code>readHeap(addrExpr)</code><br>
