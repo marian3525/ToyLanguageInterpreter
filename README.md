@@ -45,15 +45,15 @@ Example (after having opened the file):<br>
 	<code>readFile(descriptor, a)</code><br>
 
 # -close file statements
-	Syntax:
-		<code>closeFile(descriptor)</code><br>
+Syntax:
+	<code>closeFile(descriptor)</code><br>
 
 # -allocate space into the heap
-	Syntax:
+Syntax:
 		<code>new(varHeapPtr, initValueExpr)</code><br>
-	Example:<br>
+Example:<br>
 		<code>new(ptr, 11)</code>. Now at address ptr value 11 is stored<br>
 # -read from the heap
-	Syntax:
+Syntax:
 		<code>readHeap(addrExpr)</code><br>
 		
