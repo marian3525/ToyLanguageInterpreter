@@ -16,7 +16,7 @@ import org.junit.Test;
 import java.io.*;
 
 public class FileOperationsTest {
-    private final String path = "";
+    private final String path = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles";
     private Controller controller;
 
     @Before
@@ -50,7 +50,7 @@ public class FileOperationsTest {
     @Test
     public void testExecute() throws IOException {
         try {
-            controller.addStatementString("openFile(a, testFile1.txt", "test1");
+            controller.addStatementString("openFile(a, testFile1.txt)", "test1");
             controller.run("test1");
             //check the UID of the new opened file
             assert controller.getSymbols("test1").get("a") == 1;
@@ -98,7 +98,7 @@ public class FileOperationsTest {
     @After
     public void tearDown() {
         // delete the created test files
-        new File(path + "outputFiles/programCreatedFiles/testFile1.txt").delete();
-        new File(path + "outputFiles/programCreatedFiles/testFile2.txt").delete();
+        new File(path + "testFile1.txt").delete();
+        new File(path + "testFile2.txt").delete();
     }
 }

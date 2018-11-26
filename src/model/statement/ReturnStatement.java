@@ -3,11 +3,14 @@ package model.statement;
 import exceptions.SyntaxException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import parsers.ExpressionParser;
 
 public class ReturnStatement extends AbstractStatement {
 
+    @RegExp
+    private static final String returnStatementRegex = "^return .*$";
     private String functionName;
     private AbstractExpression value;
 
@@ -57,7 +60,7 @@ public class ReturnStatement extends AbstractStatement {
     public ProgramState execute(ProgramState programState) {
         //flag the end of the execution
         programState.setFunctionFinished(true);
-        return programState;
+        return null;
     }
 
     @Override
@@ -68,5 +71,15 @@ public class ReturnStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(returnStatementRegex);
     }
 }

@@ -69,7 +69,7 @@ public class Controller {
                 //clean up the files left opened
                 Map<Integer, Pair<String, BufferedReader>> files = repo.getProgramByName(progName).getFiles().getAll();
 
-                files.keySet().stream().
+                files.keySet().
                         forEach(
                                 (Integer descriptor) -> {
                                     try {

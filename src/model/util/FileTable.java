@@ -30,8 +30,9 @@ public class FileTable implements FileTableInterface {
         if (!f.exists() || f.isDirectory()) {
             new BufferedWriter(new FileWriter(path + "\\" + filename)).close();
         }
-        files.put(descriptor, new Pair<>(filename, new BufferedReader(
-                new FileReader(path + "\\" + filename))));
+        BufferedReader reader = new BufferedReader(new FileReader(path + "\\" + filename));
+        Pair<String, BufferedReader> entry =  new Pair<>(filename, reader);
+        files.put(descriptor, entry);
         return descriptor;
     }
 

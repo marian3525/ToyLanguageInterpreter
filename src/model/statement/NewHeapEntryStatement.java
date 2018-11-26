@@ -5,11 +5,14 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import parsers.ExpressionParser;
 
 public class NewHeapEntryStatement extends AbstractStatement {
 
+    @RegExp
+    private static final String newHeapEntryStatementRegex = "^new\\(.*\\)$";
     private String varName;
     private AbstractExpression expression;
     private String functionName;
@@ -47,7 +50,7 @@ public class NewHeapEntryStatement extends AbstractStatement {
         int addr = programState.getHeap().put(value);
         programState.getSymbols().put(varName, addr);
 
-        return programState;
+        return null;
     }
 
     @Override
@@ -73,5 +76,13 @@ public class NewHeapEntryStatement extends AbstractStatement {
      * @throws UndefinedOperationException
      * @throws UndefinedVariableException
      */
-
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(newHeapEntryStatementRegex);
+    }
 }

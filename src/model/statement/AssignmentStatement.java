@@ -14,14 +14,15 @@ import java.util.Map;
 import java.util.Stack;
 
 public class AssignmentStatement extends AbstractStatement {
+    // must be used with the matchesString() function to correctly identify an assignment statement
+
+    @RegExp
+    private static final String assignmentRegex = "^[a-zA-Z_]+[a-zA-Z0-9_]*=.*$";
     private String id;
     private AbstractExpression expression;
     private String functionName;
-    @RegExp
-    public static final String assignmentRegex = "^[a-zA-Z_]+[a-zA-Z0-9_]*=.*";
 
     public AssignmentStatement(String id, AbstractExpression expression) {
-
         this.id = id;
         this.expression = expression;
         this.functionName = "main";
@@ -49,7 +50,7 @@ public class AssignmentStatement extends AbstractStatement {
         //if the key already exists, update the pair
         symbols.put(id, expressionValue);
 
-        return programState;
+        return null;
     }
 
     @Override
@@ -77,5 +78,14 @@ public class AssignmentStatement extends AbstractStatement {
         AbstractExpression rhsExp = ExpressionParser.getExpressionFromString(sides[1]);
         AssignmentStatement assignmentStatement = new AssignmentStatement(varName, rhsExp);
         return assignmentStatement;
+    }
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(assignmentRegex) && !statementString.contains(";");
     }
 }

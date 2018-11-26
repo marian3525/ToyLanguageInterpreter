@@ -3,9 +3,16 @@ package model.statement;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import parsers.StatementParser;
 
 public class CompoundStatement extends AbstractStatement {
+
+    // Note! This regex alone will match not only the compound statement, but also any statement which contains ';'
+    // must be used with the matchesString() function in order to correctly identify a compound statement string
+    @RegExp
+    private static final String compoundStatementRegex = "^.*;.*$";
+
     private AbstractStatement first;
     private AbstractStatement second;
     private String functionName;
@@ -51,7 +58,7 @@ public class CompoundStatement extends AbstractStatement {
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException {
         programState.getExecutionStack().push(second);
         programState.getExecutionStack().push(first);
-        return programState;
+        return null;
     }
 
     @Override
@@ -67,5 +74,16 @@ public class CompoundStatement extends AbstractStatement {
     @Override
     public String toString() {
         return "(" + first.toString() + ";" + second.toString() + ")";
+    }
+
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(compoundStatementRegex) && !statementString.contains("if") &&
+                !statementString.contains("while");
     }
 }

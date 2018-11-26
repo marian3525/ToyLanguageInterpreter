@@ -4,12 +4,15 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import javafx.util.Pair;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
 public class OpenFileStatement extends AbstractStatement {
-    private static final String programFilesPath = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles\\programCreatedFiles";
+    @RegExp
+    private static final String openFileStatementRegex = "^openFile\\(.*\\)$";
+    private static final String programFilesPath = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles";
     private String varName;
     private String filename;
     private String functionName;
@@ -55,9 +58,8 @@ public class OpenFileStatement extends AbstractStatement {
             }
         }
         //update the varName with the new UID (descriptor) and store the file
-        programState.getSymbols().put(varName,
-                programState.getFiles().storeFile(filename, programFilesPath));
-        return programState;
+        programState.getSymbols().put(varName, programState.getFiles().storeFile(filename, programFilesPath));
+        return null;
     }
 
     @Override
@@ -68,5 +70,15 @@ public class OpenFileStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(openFileStatementRegex);
     }
 }

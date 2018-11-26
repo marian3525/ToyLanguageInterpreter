@@ -14,14 +14,14 @@ public class CompoundStatementTest {
     public void testExecute() {
         ProgramState state = new ProgramState();
 
-        AbstractStatement first = new AssignmentStatement("a", new ConstantExpression(3));
+        AbstractStatement first = new AssignmentStatement("a", new ConstantExpression(4));
         AbstractStatement second = new PrintStatement(new VariableExpression("a"));
 
         CompoundStatement s = new CompoundStatement(first, second);
 
         try {
             s.execute(state);
-        } catch (exceptions.UndefinedOperationException | exceptions.UndefinedVariableException | java.io.IOException e) {
+        } catch (exceptions.UndefinedOperationException e) {
             assert false;
         }
 

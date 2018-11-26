@@ -97,7 +97,7 @@ public class LoadFunctionFromFileStatement extends AbstractStatement {
                 }
             }
         }
-        return programState;
+        return null;
     }
 
     @Override

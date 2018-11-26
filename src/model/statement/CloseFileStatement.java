@@ -5,11 +5,15 @@ import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import parsers.ExpressionParser;
 
 import java.io.IOException;
 
 public class CloseFileStatement extends AbstractStatement {
+
+    @RegExp
+    private static final String closeFileStatementRegex = "closeFile\\([^\\s]+\\)";
 
     private AbstractExpression fileId;
     private String functionName;
@@ -53,7 +57,7 @@ public class CloseFileStatement extends AbstractStatement {
         //and delete the entry from the table
         programState.getFiles().getAll().remove(descriptor);
 
-        return programState;
+        return null;
     }
 
     @Override
@@ -64,5 +68,14 @@ public class CloseFileStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(closeFileStatementRegex);
     }
 }

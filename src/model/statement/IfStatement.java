@@ -16,8 +16,11 @@ public class IfStatement extends AbstractStatement {
     private AbstractStatement thenStatement;
     private AbstractStatement elseStatement;
     private String functionName;
+
+    //match expressions like: if cond then expr1 else expr2
+    //else branch is optional
     @RegExp
-    public static final String ifRegex = "";
+    private static final String ifStatementRegex = "^if\\s[^\\s]+\\sthen\\s[^\\s]+(\\selse\\s[^\\s]+)?$";
 
     public IfStatement(AbstractExpression condition, AbstractStatement thenStatement, AbstractStatement elseStatement) {
         this.condition = condition;
@@ -78,7 +81,7 @@ public class IfStatement extends AbstractStatement {
         else {
             programState.getExecutionStack().push(elseStatement);
         }
-        return programState;
+        return null;
     }
 
     @Override
@@ -89,5 +92,14 @@ public class IfStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(ifStatementRegex);
     }
 }

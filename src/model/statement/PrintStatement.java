@@ -13,7 +13,7 @@ import java.io.IOException;
 public class PrintStatement extends AbstractStatement {
     private AbstractExpression expression;
     @RegExp
-    public static final String printRegex = "";
+    private static final String printStatementRegex = "^print\\(.*\\)$";
     private String functionName;
 
     public PrintStatement(AbstractExpression expression) {
@@ -57,7 +57,7 @@ public class PrintStatement extends AbstractStatement {
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
         programState.getOutput().add(Integer.toString(expression.evaluate(programState.getSymbols(), programState.getHeap())));
-        return programState;
+        return null;
     }
 
     @Override
@@ -68,5 +68,15 @@ public class PrintStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(printStatementRegex);
     }
 }

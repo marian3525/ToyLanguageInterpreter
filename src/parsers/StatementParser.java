@@ -7,64 +7,60 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class StatementParser {
+
+    public enum StatementType {
+        AssignmentStatement, CallStatement, CloseFileStatement, CompoundStatement, DecrementStatement,
+        ForkStatement, IfStatement, IncrementStatement, LoadFunctionFromFileStatement, NewHeapEntryStatement, OpenFileStatement,
+        PrintStatement, ReadFileStatement, ReturnStatement, WhileStatement, WriteHeapStatement, UndefinedStatement
+    }
     /**
      * Used to decide on the type of a statement based on its semantics
      *
      * @param statementStr: statement as string
      * @return Assignment/Compound/If/Print depending on the statement type
      */
-    public static StatementType getStatementType(@NotNull String statementStr) {
-        //split by the first =
-        String[] aux = statementStr.split("=");
+    private static StatementType getStatementType(@NotNull String statementStr) throws SyntaxException {
 
-        String[] openAndReadCheck = statementStr.split(",");
-        //also check if it contains ';'; it might be a compound statement
-        if (statementStr.startsWith("openFile") && openAndReadCheck.length == 2 && !statementStr.contains(";")) {
+        if (OpenFileStatement.matchesString(statementStr)) {
             return StatementType.OpenFileStatement;
         }
-        if (statementStr.startsWith("readFile") && openAndReadCheck.length == 2 && !statementStr.contains(";")) {
+        else if (ReadFileStatement.matchesString(statementStr)) {
             return StatementType.ReadFileStatement;
         }
-        if (statementStr.startsWith("closeFile") && openAndReadCheck.length == 1 && !statementStr.contains(";")) {
+        else if (CloseFileStatement.matchesString(statementStr)) {
             return StatementType.CloseFileStatement;
         }
-        //TODO does not enter if on a=1==2
-        if (statementStr.matches(AssignmentStatement.assignmentRegex) && !statementStr.contains(";") && !statementStr.contains("while")
-                && !statementStr.contains("if"))
+        else if (AssignmentStatement.matchesString(statementStr))
             return StatementType.AssignmentStatement;
-
-        aux = statementStr.split(";");
-        if (aux.length >= 2 && !statementStr.contains("if(") && !statementStr.contains("while(")) {
+        else if (CompoundStatement.matchesString(statementStr)) {
             return StatementType.CompoundStatement;
         }
-        else if (statementStr.contains("if") && statementStr.contains("then") && statementStr.contains("else")) {
+        else if (IfStatement.matchesString(statementStr)) {
             return StatementType.IfStatement;
         }
-        else if (statementStr.contains("print(") && statementStr.endsWith(")")) {
+        else if (PrintStatement.matchesString(statementStr)) {
             return StatementType.PrintStatement;
         }
-
-        if (statementStr.contains("call") && statementStr.contains("(") && statementStr.contains(")")) {
+        else if (CallStatement.matchesString(statementStr)) {
             return StatementType.CallStatement;
         }
-        else if (statementStr.contains("load") && statementStr.split(" ").length == 2) {
+        else if (false) {
             return StatementType.LoadFunctionFromFileStatement;
         }
-        else if (statementStr.contains("return")) {
+        else if (ReturnStatement.matchesString(statementStr)) {
             return StatementType.ReadFileStatement;
         }
-
-        if (statementStr.contains("new")) {
+        else if (NewHeapEntryStatement.matchesString(statementStr)) {
             return StatementType.NewHeapEntryStatement;
         }
-        else if (statementStr.contains("writeHeap")) {
+        else if (WriteHeapStatement.matchesString(statementStr)) {
             return StatementType.WriteHeapStatement;
         }
-
-        if (statementStr.contains("while(")) {
+        else if (WhileStatement.matchesString(statementStr)) {
             return StatementType.WhileStatement;
         }
-        return null;
+        else
+            throw new SyntaxException("Invalid syntax in: " + statementStr);
     }
 
     /**
@@ -73,7 +69,9 @@ public class StatementParser {
      * @throws SyntaxException if the input string is has syntactic errors
      */
     public static AbstractStatement getStatementFromString(String statement) throws SyntaxException {
+
         StatementType statementType = getStatementType(statement);
+
         switch (Objects.requireNonNull(statementType)) {
             case AssignmentStatement:
                 return AssignmentStatement.getAssignmentStatementFromString(statement);
@@ -110,12 +108,6 @@ public class StatementParser {
             case UndefinedStatement:
                 return null;
         }
-        return null;
-    }
-
-    public enum StatementType {
-        AssignmentStatement, CallStatement, CloseFileStatement, CompoundStatement, DecrementStatement,
-        ForkStatement, IfStatement, IncrementStatement, LoadFunctionFromFileStatement, NewHeapEntryStatement, OpenFileStatement,
-        PrintStatement, ReadFileStatement, ReturnStatement, WhileStatement, WriteHeapStatement, UndefinedStatement
+        throw new SyntaxException("Syntax of:" + statement + "couldn't be matched to a statement class");
     }
 }

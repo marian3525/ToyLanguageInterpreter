@@ -6,9 +6,12 @@ import exceptions.UndefinedVariableException;
 import model.adt.Heap;
 import model.expression.AbstractExpression;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import parsers.ExpressionParser;
 
 public class WriteHeapStatement extends AbstractStatement {
+    @RegExp
+    private static final String writeHeapStatementRegex = "^writeHeap\\(.*\\)$";
     private String varName;
     private String functionName;
     private AbstractExpression expression;
@@ -56,7 +59,7 @@ public class WriteHeapStatement extends AbstractStatement {
             programState.getHeap().setContent(h.getContent());
         } else
             throw new UndefinedOperationException("Cannot write to address not yet allocated");
-        return programState;
+        return null;
     }
 
     @Override
@@ -67,5 +70,14 @@ public class WriteHeapStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(writeHeapStatementRegex);
     }
 }

@@ -6,6 +6,7 @@ import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
 import model.function.Function;
 import model.programState.ProgramState;
+import org.intellij.lang.annotations.RegExp;
 import parsers.StatementParser;
 
 import java.io.IOException;
@@ -14,6 +15,9 @@ import java.util.Stack;
 import java.util.Vector;
 
 public class CallStatement extends AbstractStatement {
+    @RegExp
+    private static final String callStatementRegex = "";
+
     private String functionName;
     private Vector<AbstractExpression> args;
     private String returnVar;
@@ -96,7 +100,7 @@ public class CallStatement extends AbstractStatement {
             stack.pop();
         }
 
-        return programState;
+        return null;
     }
 
     @Override
@@ -107,5 +111,15 @@ public class CallStatement extends AbstractStatement {
     @Override
     public void setFunction(String functionName) {
         this.functionName = functionName;
+    }
+
+    /**
+     * Check if the given string matches the structure of the statement described by this class
+     * @param statementString string to be checked
+     * @return true if the class can parse the string and output an object of this type
+     *          false if the string doesn't match the class
+     */
+    public static boolean matchesString(String statementString) {
+        return statementString.matches(callStatementRegex);
     }
 }
