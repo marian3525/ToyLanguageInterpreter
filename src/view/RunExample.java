@@ -36,4 +36,17 @@ public class RunExample extends Command {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void executeConcurrent() {
+        try {
+            controller.runConcurrent();
+        } catch (RepositoryException e) {
+            System.out.println("Program Exception: " + e.getMessage());
+        } catch (NullPointerException npe) {
+            System.out.println("Runtime exception: " + npe.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

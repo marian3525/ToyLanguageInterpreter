@@ -13,6 +13,12 @@ public class IncrementStatement extends AbstractStatement {
     public IncrementStatement(String varName) {
         this.varName = varName;
     }
+
+    public static IncrementStatement getIncrementStatementFromString(String statement) {
+        String varName = statement.replace(" ", "").replace("++", "");
+        return new IncrementStatement(varName);
+    }
+
     @Override
     public String toString() {
         return varName + "++";
@@ -22,7 +28,7 @@ public class IncrementStatement extends AbstractStatement {
     public ProgramState execute(ProgramState programState) throws UndefinedVariableException {
         Integer value = programState.getSymbols().get(varName);
         if(value == null) {
-            throw new UndefinedVariableException("Variable " + varName + " not defined");
+            throw new UndefinedVariableException("Variable '" + varName + "' not defined");
         }
         value = value + 1;
         programState.getSymbols().put(varName, value);

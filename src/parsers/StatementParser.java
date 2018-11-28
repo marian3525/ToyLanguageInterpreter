@@ -58,8 +58,9 @@ public class StatementParser {
         }
         else if (WhileStatement.matchesString(statementStr)) {
             return StatementType.WhileStatement;
-        }
-        else
+        } else if (ForkStatement.matchesString(statementStr)) {
+            return StatementType.ForkStatement;
+        } else
             throw new SyntaxException("Invalid syntax in: " + statementStr);
     }
 
@@ -100,14 +101,14 @@ public class StatementParser {
             case WhileStatement:
                 return WhileStatement.getWhileExpressionFromString(statement);
             case ForkStatement:
-                return null;//todo
+                return ForkStatement.getForkStatementFromString(statement);
             case IncrementStatement:
-                return null;//todo
+                return IncrementStatement.getIncrementStatementFromString(statement);
             case DecrementStatement:
-                return null;//todo
+                return DecrementStatement.getDecrementStatementFromString(statement);
             case UndefinedStatement:
-                return null;
+                throw new SyntaxException("Syntax of:" + statement + "couldn't be matched to a statement class");
         }
-        throw new SyntaxException("Syntax of:" + statement + "couldn't be matched to a statement class");
+        return null;
     }
 }

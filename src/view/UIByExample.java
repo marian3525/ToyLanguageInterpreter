@@ -30,7 +30,12 @@ public class UIByExample {
             System.out.println("Input the option");
             String key = scanner.nextLine();
             try {
-                commands.get(key).execute();
+                //use the run concurrent method from the controller
+                if (commands.get(key).getDescription().contains("thread")) {
+                    commands.get(key).executeConcurrent();
+                } else {
+                    commands.get(key).execute();
+                }
             } catch (NullPointerException npe) {
                 System.out.println("Invalid cmd");
             }

@@ -84,6 +84,6 @@ public class CompoundStatement extends AbstractStatement {
      */
     public static boolean matchesString(String statementString) {
         return statementString.matches(compoundStatementRegex) && !statementString.contains("if") &&
-                !statementString.contains("while");
+                !statementString.contains("while(") && !statementString.contains("fork(");
     }
 }

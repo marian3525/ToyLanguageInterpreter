@@ -13,6 +13,11 @@ public class DecrementStatement extends AbstractStatement {
         this.varName = varName;
     }
 
+    public static DecrementStatement getDecrementStatementFromString(String statement) {
+        String varName = statement.replace(" ", "").replace("--", "");
+        return new DecrementStatement(varName);
+    }
+
     @Override
     public String toString() {
         return varName + "--";

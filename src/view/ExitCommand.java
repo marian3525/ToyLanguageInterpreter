@@ -9,4 +9,9 @@ public class ExitCommand extends Command {
     public void execute() {
         System.exit(0);
     }
+
+    @Override
+    public void executeConcurrent() {
+
+    }
 }

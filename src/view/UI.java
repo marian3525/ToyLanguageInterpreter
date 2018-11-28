@@ -8,6 +8,12 @@ import java.util.Scanner;
 
 public class UI {
     private Controller controller;
+    //execution flags
+    private boolean quitting = false;
+    private String progName = "";
+    private boolean printing = false;
+    private boolean autorun = false;
+    private boolean multithreaded = false;
 
     public UI() {
         controller = new Controller();
@@ -96,11 +102,6 @@ public class UI {
     }
 
     private void runUI() {
-        boolean quitting = false;
-        String progName = "";
-        boolean printing = false;
-        boolean autorun = false;
-
         while (!quitting) {
             String cmd = readFromConsole("(" + progName + ")" + ">");
             String[] parts = cmd.split(" ");
@@ -141,6 +142,7 @@ public class UI {
                 case "default":
                     //default config: view true, progName = prog, autorun true
                     printing = true;
+                    multithreaded = true;
                     progName = "prog";
                     try {
                         controller.addEmptyProgram(progName);
@@ -152,6 +154,11 @@ public class UI {
                 case "flags":
                     System.out.println("Viewing: " + printing);
                     System.out.println("Autorun: " + autorun);
+                    System.out.println("Multithreading: " + multithreaded);
+                    continue;
+                case "mt":
+                    multithreaded = !multithreaded;
+                    System.out.println("Multithreading set to " + multithreaded);
                     continue;
                 case "help":
                     printHelp();
@@ -182,7 +189,15 @@ public class UI {
     private void runProgram(String progName, boolean printing) {
         try {
             System.out.println("Running program...");
-            controller.run(progName);
+            //pick the threading option
+            if (multithreaded) {
+                try {
+                    controller.runConcurrent();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else
+                controller.run(progName);
             if (printing) {
                 printInternals(progName);
             }

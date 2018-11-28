@@ -12,12 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class Repository implements RepositoryInterface {
     //vector of running programs
     private String logPath = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles\\log.txt";
     private Map<String, ProgramState> progs;
-    private static boolean isCreated = false;
 
     public Repository() {
         progs = new HashMap<>();
@@ -26,13 +26,12 @@ public class Repository implements RepositoryInterface {
             PrintWriter logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath, false)));
             logFile.close();
         } catch (IOException e) {
-
         }
     }
 
     public void addProgram(String progName, ProgramState programState) throws RepositoryException {
         if(progs.containsKey(progName)) {
-            throw new RepositoryException("Program " + progName + " already exists!");
+            throw new RepositoryException("Program '" + progName + "' already exists!");
         }
         else {
             progs.put(progName, programState);
@@ -44,7 +43,7 @@ public class Repository implements RepositoryInterface {
             return progs.get(progName);
         }
         else {
-            throw new RepositoryException("Program with name: " + progName + " does not exist");
+            throw new RepositoryException("Program with name: '" + progName + "' does not exist");
         }
     }
 
@@ -52,7 +51,6 @@ public class Repository implements RepositoryInterface {
     public void setPath(String path) {
         this.logPath = path;
     }
-
     /**
      * Print the program state in the given path in the format:
      * ExeStack:
@@ -79,16 +77,35 @@ public class Repository implements RepositoryInterface {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void logProgramState(ProgramState state) throws IOException {
-        PrintWriter logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
+    public void logProgramState(ProgramState state) {
+        PrintWriter logFile = null;
+        try {
+            logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
+        } catch (IOException e) {
+
+        }
         String[] keys = {"stack", "symbols", "output", "files", "heap"};
         Map<String, String> stringMap = getStrings(state);
 
+        //print the name of the program with this progState:
+        String progName = progs.keySet().stream().filter(pkey -> progs.get(pkey) == state)
+                .collect(Collectors.toList()).get(0);
+        logFile.println(System.lineSeparator() + "ProgramState name: " + progName);
         for (String key : keys) {
             logFile.print(stringMap.get(key));
             logFile.println("--------------------------------------------------");
         }
         logFile.close();
+    }
+
+    @Override
+    public Map<String, ProgramState> getPrograms() {
+        return progs;
+    }
+
+    @Override
+    public void setPrograms(Map<String, ProgramState> newPrograms) {
+        progs = newPrograms;
     }
 
     /**
@@ -100,13 +117,13 @@ public class Repository implements RepositoryInterface {
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, String> getStrings(ProgramState state) {
+
         Map<String, String> stringMap = new HashMap<>();
-        String stackString, outputString, symbolsString, filesString, heapString;
+        String progNameString, stackString, outputString, symbolsString, filesString, heapString;
         Stack<AbstractStatement> s = (Stack<AbstractStatement>) state.getExecutionStack().clone();
 
         //build each string with a builder
         StringBuilder builder = new StringBuilder();
-
         //stack string
         builder.append("Execution stack:").append(System.lineSeparator());
         while (!s.isEmpty()) {
@@ -131,6 +148,7 @@ public class Repository implements RepositoryInterface {
         for (Object key : symTable.keySet()) {
             builder.append((String) key).append(" --> ").append(symTable.get(key).toString()).append(" | ");
         }
+        builder.append(System.lineSeparator());
         symbolsString = builder.toString();
         builder.delete(0, builder.length());    //clear the builder
 

@@ -14,11 +14,15 @@ import repository.RepositoryInterface;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
 public class Controller {
     private RepositoryInterface repo;
+    private ExecutorService executorService;
 
     public Controller() {
         repo = new Repository();
@@ -34,14 +38,9 @@ public class Controller {
      */
     public void step(String progName) throws RepositoryException, UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException, ProgramException {
         ProgramState state = repo.getProgramByName(progName);
-        AbstractStatement top;
 
-        try {
-            top = state.getExecutionStack().pop();
-        } catch (EmptyStackException ese) {
-            throw new ProgramException("End of program reached");
-        }
-        top.execute(state);
+        state.step();
+
         //gc
         Collection<Integer> values = state.getSymbols().values();
         Map<Integer, Integer> all = state.getHeap().getContent();
@@ -49,13 +48,13 @@ public class Controller {
         Map<Integer, Integer> cleanHeap = gc(values, all);
         state.getHeap().setContent(cleanHeap);
 
-        //repo.logProgramState(state);  //todo remove comment after debug
+        repo.logProgramState(state);
     }
 
     /**
      * Run all the instructions in the current program
      * @param progName the name of the program to be run
-     * @throws ProgramException if the specified can't be run because it doesn't exist
+     * @throws ProgramException if the specified program can't be run because it doesn't exist
      * @throws UndefinedOperationException  if an operation without definition is encountered
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
@@ -67,21 +66,86 @@ public class Controller {
             } catch (ProgramException pe) {
                 //end of program reached
                 //clean up the files left opened
-                Map<Integer, Pair<String, BufferedReader>> files = repo.getProgramByName(progName).getFiles().getAll();
-
-                files.keySet().
-                        forEach(
-                                (Integer descriptor) -> {
-                                    try {
-                                        files.get(descriptor).getValue().close();
-                                    } catch (IOException e) {
-
-                                    }
-                                }
-                        );
+                //closeFiles(progName);
                 break;
             }
         }
+    }
+
+    private void stepOnAll(List<String> progNames) throws InterruptedException, RepositoryException {
+        // needed for testing where stepOnAll is required, but not runAll
+        if (executorService == null)
+            executorService = Executors.newFixedThreadPool(2);
+
+        Map<String, ProgramState> programs = new HashMap<>();
+        for (String progName : progNames) {
+            programs.put(progName, repo.getProgramByName(progName));
+        }
+        List<ProgramState> programStates = new ArrayList<>(programs.values());
+
+        //print the program state before execution
+        //programStates.forEach((state)-> repo.logProgramState(state));
+
+        //run one step concurrently on all programs in the list
+        //prepare the list
+        List<Callable<ProgramState>> callList = programStates.stream()
+                .map((ProgramState programState) -> (Callable<ProgramState>) (programState::step))
+                .collect(Collectors.toList());
+
+        //start the execution of the callables, returns a new list of progStates, threads
+        List<ProgramState> newStates = executorService.invokeAll(callList).stream()
+                .map(
+                        programStateFuture -> {
+                            try {
+                                return programStateFuture.get();
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        }
+                ).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        //add the newly created threads to the old ones to be stored in the repo
+        for (ProgramState p : newStates) {
+            programs.put(String.valueOf(p.getId()), p);
+        }
+        repo.setPrograms(programs);
+        //log the state
+        //newStates.forEach(progState -> repo.logProgramState(progState));
+    }
+
+    public void runConcurrent() throws InterruptedException, RepositoryException {
+        executorService = Executors.newFixedThreadPool(2);
+
+        //remove completed programs
+        Map<String, ProgramState> progStates = removeCompleted(repo.getPrograms());
+
+        //print the program state before execution
+        progStates.forEach((str, state) -> repo.logProgramState(state));
+
+        while (progStates.size() > 0) {
+            //gc for all the current programStates
+            progStates.forEach((name, state) ->
+                    state.getHeap().setContent(gc(state.getSymbols().values(), state.getHeap().getContent())));
+
+            stepOnAll(new ArrayList<>(progStates.keySet()));
+
+            progStates.forEach((str, state) -> repo.logProgramState(state));
+            //remove completed
+            progStates = removeCompleted(repo.getPrograms());
+        }
+        executorService.shutdownNow();
+
+        //progStates.forEach((str, state)-> repo.logProgramState(state));
+
+
+        for (String progName : progStates.keySet()) {
+            closeFiles(progName);
+        }
+
+        //print the program state before execution
+
+        repo.setPrograms(progStates);
     }
 
     /**
@@ -92,7 +156,7 @@ public class Controller {
     public void addEmptyProgram(String progName) throws RepositoryException {
         ProgramState state = new ProgramState();
 
-            repo.addProgram(progName, state);
+        repo.addProgram(progName, state);
     }
 
     /**
@@ -138,6 +202,9 @@ public class Controller {
         return (Heap) repo.getProgramByName(progName).getHeap();
     }
 
+    public Map<String, ProgramState> getAllStates() {
+        return repo.getPrograms();
+    }
     /**
      * Remove the values from the heap which are not referenced by any of the values from the symbols
      *
@@ -152,5 +219,24 @@ public class Controller {
                 .filter(e -> symTableValues.contains(e.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return o;
+    }
+
+    private Map<String, ProgramState> removeCompleted(Map<String, ProgramState> inMap) {
+        return inMap.entrySet().stream().filter((program) -> program.getValue().isNotCompleted())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private void closeFiles(String progName) throws RepositoryException {
+        Map<Integer, Pair<String, BufferedReader>> files = repo.getProgramByName(progName).getFiles().getAll();
+
+        files.keySet().
+                forEach(
+                        (Integer descriptor) -> {
+                            try {
+                                files.get(descriptor).getValue().close();
+                            } catch (IOException e) {
+                            }
+                        }
+                );
     }
 }

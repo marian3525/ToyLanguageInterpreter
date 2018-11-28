@@ -1,20 +1,33 @@
 package model.statement;
 
+import exceptions.SyntaxException;
 import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
+import parsers.StatementParser;
 
 public class ForkStatement extends AbstractStatement {
-    //.clone on the symtable to pass to the new thread
     @RegExp
-    private static final String forkStatementRegex = "^fork\\(.*\\)$";
-    @Override
-    public String toString() {
-        return null;
+    private static final String forkStatementRegex = "fork\\(.*\\)$";
+    private AbstractStatement statement;
+
+    public ForkStatement(AbstractStatement statement) {
+        this.statement = statement;
     }
 
-    @Override
-    public ProgramState execute(ProgramState programState) {
-        return null;
+    /**
+     * Syntax: fork(statement)
+     * @param input: statement string
+     * @return
+     */
+    public static ForkStatement getForkStatementFromString(String input) throws SyntaxException {
+        String statementStr = input.replace(" ", "").
+                replace("fork(", "").replaceAll("\\)$", "");
+        AbstractStatement param = StatementParser.getStatementFromString(statementStr);
+        return new ForkStatement(param);
+    }
+
+    public static boolean matchesString(String statementStr) {
+        return statementStr.matches(forkStatementRegex);
     }
 
     @Override
@@ -26,13 +39,17 @@ public class ForkStatement extends AbstractStatement {
     public void setFunction(String functionName) {
 
     }
-    /**
-     * Check if the given string matches the structure of the statement described by this class
-     * @param statementString string to be checked
-     * @return true if the class can parse the string and output an object of this type
-     *          false if the string doesn't match the class
-     */
-    public static boolean matchesString(String statementString) {
-        return statementString.matches(forkStatementRegex);
+
+    @Override
+    public String toString() {
+        return "fork(" + statement.toString() + ")";
+    }
+
+    @Override
+    public ProgramState execute(ProgramState programState) {
+        //create new program state with the copy constructor which does the appropriate copying and referencing
+        ProgramState newState = new ProgramState(programState);
+        newState.getExecutionStack().push(statement);
+        return newState;
     }
 }

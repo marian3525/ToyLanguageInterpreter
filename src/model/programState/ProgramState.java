@@ -1,19 +1,18 @@
 package model.programState;
 
 
+import exceptions.ProgramException;
+import exceptions.SyntaxException;
+import exceptions.UndefinedOperationException;
+import exceptions.UndefinedVariableException;
 import model.adt.Heap;
 import model.function.AbstractFunction;
 import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 
 public class ProgramState {
     private Stack<AbstractStatement> executionStack;
@@ -22,6 +21,8 @@ public class ProgramState {
     private Vector<String> output;
     private FileTable files;
     private HeapInterface heap;
+    private static int progCount = 0;       //used to assign an unique id to every progState
+    private int id;
     private int lastReturn;
     private boolean functionFinished;
 
@@ -32,7 +33,33 @@ public class ProgramState {
         output = new Vector<>(10);
         files = new FileTable();
         heap = new Heap();
+        id = progCount;
+        progCount++;
     }
+
+    /**
+     * Copy constructor: copy the symbols. Copy the reference to the heap, filetable and output
+     * Used by forkStatement
+     */
+    public ProgramState(ProgramState source) {
+        executionStack = new Stack<>();
+        symbols = new HashMap<>();
+        functionTable = new HashMap<>();
+
+        // copy
+        source.symbols.forEach(symbols::put);
+        source.functionTable.forEach(functionTable::put);
+
+        // reference
+        output = source.output;
+        // reference
+        files = source.files;
+        // reference
+        heap = source.heap;
+        id = progCount;
+        progCount++;
+    }
+
 
     public Stack<AbstractStatement> getExecutionStack() {
         return executionStack;
@@ -77,8 +104,25 @@ public class ProgramState {
         this.functionFinished = finished;
     }
 
-    public void logToFile(String filename) throws IOException {
-        PrintWriter logFile = new PrintWriter(new FileWriter(filename, false));
-        //todo: move printing from repo to programState
+    public int getId() {
+        return id;
+    }
+
+    public boolean isNotCompleted() {
+        return !executionStack.empty();
+    }
+
+    public ProgramState step() throws ProgramException, UndefinedVariableException, UndefinedOperationException, SyntaxException, IOException {
+        AbstractStatement top;
+
+        try {
+            top = executionStack.pop();
+        } catch (EmptyStackException ese) {
+            throw new ProgramException("End of program reached");
+        }
+        if (top != null)
+            return top.execute(this);
+        else
+            return null;
     }
 }
