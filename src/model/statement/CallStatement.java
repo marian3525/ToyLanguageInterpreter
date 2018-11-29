@@ -4,14 +4,11 @@ import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
-import model.function.Function;
 import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
 import parsers.StatementParser;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Stack;
 import java.util.Vector;
 
 public class CallStatement extends AbstractStatement {
@@ -39,7 +36,6 @@ public class CallStatement extends AbstractStatement {
      *
      * @param input: statement string
      * @return the CallStatement built from the string
-     * todo: might not belong in this class
      */
     public static CallStatement getCallStatementFromString(String input) throws SyntaxException {
         //remove the 'call' and extract the function name and params
@@ -76,7 +72,7 @@ public class CallStatement extends AbstractStatement {
      */
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
-
+        /*
         Function f = (Function) programState.getFunctions().get(functionName);
         Stack<AbstractStatement> stack = programState.getExecutionStack();
         //load into the execution stack
@@ -99,7 +95,7 @@ public class CallStatement extends AbstractStatement {
         while (!stack.isEmpty() && stack.peek().getFunction().equals(functionName)) {
             stack.pop();
         }
-
+        */
         return null;
     }
 

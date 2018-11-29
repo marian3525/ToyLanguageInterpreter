@@ -25,7 +25,7 @@ public class Main {
         Controller controllerThreaded = new Controller();
         controllerThreaded.addEmptyProgram("threadsMain");
         controllerThreaded.addStatementString("print(readHeap(a))", "threadsMain");
-        controllerThreaded.addStatementString("print(a);a=a;a=a", "threadsMain");
+        controllerThreaded.addStatementString("print(a);a=a;a=a;a=a", "threadsMain");
         controllerThreaded.addStatementString("fork(a=2;print(a);new(addr, 10))", "threadsMain");
         controllerThreaded.addStatementString("a=1;print(a)", "threadsMain");
 

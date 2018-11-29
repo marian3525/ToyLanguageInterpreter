@@ -3,7 +3,7 @@ ProgramState name: threadsMain
 Execution stack:
 (a = 1;print(a))
 fork((a = 2;(print(a);new(addr,10))))
-(print(a);(a = a;a = a))
+(print(a);(a = a;(a = a;a = a)))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -21,7 +21,7 @@ Execution stack:
 a = 1
 print(a)
 fork((a = 2;(print(a);new(addr,10))))
-(print(a);(a = a;a = a))
+(print(a);(a = a;(a = a;a = a)))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -38,7 +38,7 @@ ProgramState name: threadsMain
 Execution stack:
 print(a)
 fork((a = 2;(print(a);new(addr,10))))
-(print(a);(a = a;a = a))
+(print(a);(a = a;(a = a;a = a)))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -54,7 +54,7 @@ Heap:
 ProgramState name: threadsMain
 Execution stack:
 fork((a = 2;(print(a);new(addr,10))))
-(print(a);(a = a;a = a))
+(print(a);(a = a;(a = a;a = a)))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -69,7 +69,7 @@ Heap:
 
 ProgramState name: threadsMain
 Execution stack:
-(print(a);(a = a;a = a))
+(print(a);(a = a;(a = a;a = a)))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -100,7 +100,7 @@ Heap:
 ProgramState name: threadsMain
 Execution stack:
 print(a)
-(a = a;a = a)
+(a = a;(a = a;a = a))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -115,7 +115,7 @@ Heap:
 
 ProgramState name: threadsMain
 Execution stack:
-(a = a;a = a)
+(a = a;(a = a;a = a))
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -160,7 +160,7 @@ Heap:
 ProgramState name: threadsMain
 Execution stack:
 a = a
-a = a
+(a = a;a = a)
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -175,7 +175,7 @@ Heap:
 
 ProgramState name: threadsMain
 Execution stack:
-a = a
+(a = a;a = a)
 print(readHeap(a))
 --------------------------------------------------
 Symbol Table:
@@ -207,6 +207,39 @@ Execution stack:
 --------------------------------------------------
 Symbol Table:
 a --> 2 | addr --> 1 | 
+--------------------------------------------------
+Output:
+1 | 1 | 2 | --------------------------------------------------
+File Table:
+--------------------------------------------------
+Heap:
+1-->10
+--------------------------------------------------
+
+ProgramState name: threadsMain
+Execution stack:
+a = a
+a = a
+print(readHeap(a))
+--------------------------------------------------
+Symbol Table:
+a --> 1 | 
+--------------------------------------------------
+Output:
+1 | 1 | 2 | --------------------------------------------------
+File Table:
+--------------------------------------------------
+Heap:
+1-->10
+--------------------------------------------------
+
+ProgramState name: threadsMain
+Execution stack:
+a = a
+print(readHeap(a))
+--------------------------------------------------
+Symbol Table:
+a --> 1 | 
 --------------------------------------------------
 Output:
 1 | 1 | 2 | --------------------------------------------------

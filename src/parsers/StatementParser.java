@@ -90,8 +90,8 @@ public class StatementParser {
                 return ReadFileStatement.getReadFileStatementFromString(statement);
             case CallStatement:
                 return CallStatement.getCallStatementFromString(statement);
-            case LoadFunctionFromFileStatement:
-                return LoadFunctionFromFileStatement.getLoadFunctionStatementFromString(statement);
+            //case LoadFunctionFromFileStatement:
+            //return LoadFunctionFromFileStatement.getLoadFunctionStatementFromString(statement);
             case ReturnStatement:
                 return ReturnStatement.getReturnStatementFromString(statement);
             case NewHeapEntryStatement:

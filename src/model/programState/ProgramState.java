@@ -6,7 +6,6 @@ import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.adt.Heap;
-import model.function.AbstractFunction;
 import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
@@ -17,7 +16,6 @@ import java.util.*;
 public class ProgramState {
     private Stack<AbstractStatement> executionStack;
     private Map<String, Integer> symbols;
-    private Map<String, AbstractFunction> functionTable;
     private Vector<String> output;
     private FileTable files;
     private HeapInterface heap;
@@ -29,7 +27,6 @@ public class ProgramState {
     public ProgramState() {
         executionStack = new Stack<>();
         symbols = new HashMap<>();
-        functionTable = new HashMap<>();
         output = new Vector<>(10);
         files = new FileTable();
         heap = new Heap();
@@ -44,11 +41,9 @@ public class ProgramState {
     public ProgramState(ProgramState source) {
         executionStack = new Stack<>();
         symbols = new HashMap<>();
-        functionTable = new HashMap<>();
 
         // copy
         source.symbols.forEach(symbols::put);
-        source.functionTable.forEach(functionTable::put);
 
         // reference
         output = source.output;
@@ -67,10 +62,6 @@ public class ProgramState {
 
     public Map<String, Integer> getSymbols() {
         return symbols;
-    }
-
-    public Map<String, AbstractFunction> getFunctions() {
-        return functionTable;
     }
 
     public Vector<String> getOutput() {

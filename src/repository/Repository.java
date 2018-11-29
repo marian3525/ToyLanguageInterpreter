@@ -15,7 +15,6 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 public class Repository implements RepositoryInterface {
-    //vector of running programs
     private String logPath = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles\\log.txt";
     private Map<String, ProgramState> progs;
 

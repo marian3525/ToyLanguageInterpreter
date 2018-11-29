@@ -91,7 +91,6 @@ public class BooleanExpressionTest {
             c.addStatementString("a=" + exprs[i], "test");
         }
         c.run("test");
-        //TODO
         for (int i = 0; i < exprs.length; i++) {
             assert String.valueOf(correctResults[i]).equals(c.getOutput("test").elementAt(i));
         }

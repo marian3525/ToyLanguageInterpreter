@@ -136,15 +136,6 @@ public class Controller {
         }
         executorService.shutdownNow();
 
-        //progStates.forEach((str, state)-> repo.logProgramState(state));
-
-
-        for (String progName : progStates.keySet()) {
-            closeFiles(progName);
-        }
-
-        //print the program state before execution
-
         repo.setPrograms(progStates);
     }
 
@@ -222,7 +213,18 @@ public class Controller {
     }
 
     private Map<String, ProgramState> removeCompleted(Map<String, ProgramState> inMap) {
-        return inMap.entrySet().stream().filter((program) -> program.getValue().isNotCompleted())
+
+        for (String progName : inMap.keySet()) {
+            try {
+                // close the files on progStates that completed execution
+                if (!repo.getProgramByName(progName).isNotCompleted())
+                    closeFiles(progName);
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+        }
+        return inMap.entrySet().stream()
+                .filter((program) -> program.getValue().isNotCompleted())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

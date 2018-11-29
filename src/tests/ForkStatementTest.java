@@ -47,18 +47,15 @@ public class ForkStatementTest {
     }
 
     @Test
-    public void testExecuteIntegration() throws RepositoryException, SyntaxException, UndefinedVariableException, IOException, UndefinedOperationException, InterruptedException {
+    public void testExecuteThroughController() throws RepositoryException, SyntaxException, UndefinedVariableException, IOException, UndefinedOperationException, InterruptedException {
         Controller c = new Controller();
         c.addEmptyProgram("test");
         ArrayList<String> progs = new ArrayList<>();
         progs.add("test");
-        ProgramState state;
 
         c.addStatementString("fork(a=11;print(a))", "test");
         c.addStatementString("a=12;print(a)", "test");
         assert c.getAllStates().size() == 1;
-        // one step to execute the fork
         c.runConcurrent();
-        // now there should be a new progState in the repo
     }
 }

@@ -114,7 +114,6 @@ public class ExpressionParser {
         //convert the input string into a vector of variables and constants
         Vector<String> in = tokenize(input);
 
-        //todo: doesn't convert (var1>var2)+5 properly, should be var1,var2,>,5,+
         for (String c : in) {
             //String c = in.elementAt(i);
 
