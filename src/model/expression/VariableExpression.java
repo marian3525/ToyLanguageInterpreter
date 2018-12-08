@@ -5,6 +5,7 @@ import model.interfaces.HeapInterface;
 import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class VariableExpression extends AbstractExpression {
     private String id;
@@ -26,5 +27,9 @@ public class VariableExpression extends AbstractExpression {
             return symbols.get(id);
         else
             throw new UndefinedVariableException("Variable " +  id + " not defined.");
+    }
+
+    public static boolean matchesString(String expressionStr) {
+        return Pattern.matches(variableRegex, expressionStr);
     }
 }

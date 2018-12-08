@@ -50,7 +50,7 @@ public class CloseFileStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
         int descriptor = fileId.evaluate(programState.getSymbols(), programState.getHeap());
         //close the file
         programState.getFiles().getFile(descriptor).getValue().close();

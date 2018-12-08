@@ -44,7 +44,7 @@ public class NewHeapEntryStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         int value = expression.evaluate(programState.getSymbols(), programState.getHeap());
 
         int addr = programState.getHeap().put(value);

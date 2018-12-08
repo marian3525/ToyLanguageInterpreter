@@ -38,6 +38,9 @@ public class WriteHeapStatementTest {
         Heap h = c.getHeap("test");
         assert h.get(c.getSymbols("test").get("a")) != null;
         assert h.get(c.getSymbols("test").get("a")) == 11;
+        c.addStatementString("b=readHeap(" + c.getSymbols("test").get("a").toString() + ")", "test");
+        c.run("test");
+        assert c.getHeap("test").get(c.getSymbols("test").get("b")) == 11;
 
     }
 }

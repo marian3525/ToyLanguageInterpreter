@@ -2,7 +2,7 @@ package model.statement;
 
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
-import javafx.util.Pair;
+import model.adt.Pair;
 import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
 

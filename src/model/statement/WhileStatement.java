@@ -59,7 +59,7 @@ public class WhileStatement extends AbstractStatement {
      * @throws UndefinedVariableException
      */
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         if (condition.evaluate(programState.getSymbols(), programState.getHeap()) == 0) {
             //condition is false, don't add the statement to the stack
             //the while statement will be popped after this call to execute does nothing

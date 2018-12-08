@@ -1,10 +1,7 @@
 package tests;
 
 import controller.Controller;
-import exceptions.RepositoryException;
-import exceptions.SyntaxException;
-import exceptions.UndefinedOperationException;
-import exceptions.UndefinedVariableException;
+import exceptions.*;
 import model.expression.ConstantExpression;
 import model.statement.CloseFileStatement;
 import model.statement.OpenFileStatement;
@@ -52,14 +49,16 @@ public class FileOperationsTest {
     @Test
     public void testExecute() throws IOException {
         try {
+            //After the first run, all files are closed and other asserts will give erroneous results
+            // use step instead of run so that the files are not closed
             controller.addStatementString("openFile(a, testFile1.txt)", "test1");
-            controller.run("test1");
+            controller.step("test1");
             //check the UID of the new opened file
             assert controller.getSymbols("test1").get("a") == 1 + offset;
 
             // read from an empty file, should read 0
             controller.addStatementString("readFile(" + String.valueOf(1 + offset) + ", a)", "test1");
-            controller.run("test1");
+            controller.step("test1");
             assert controller.getSymbols("test1").get("a") == 0;
 
             controller.addStatementString("closeFile(" + String.valueOf(1 + offset) + ")", "test1");
@@ -67,7 +66,7 @@ public class FileOperationsTest {
             //check that the file with the UID 1 has been removed from the fileTable
             assert controller.getFiles("test1").getAll().get(1) == null;
 
-        } catch (SyntaxException | IOException | RepositoryException | UndefinedVariableException | UndefinedOperationException e) {
+        } catch (SyntaxException | IOException | RepositoryException | UndefinedVariableException | UndefinedOperationException | ProgramException e) {
             assert false;
         }
 
@@ -78,13 +77,13 @@ public class FileOperationsTest {
 
         try {
             controller.addStatementString("openFile(a, testFile2.txt)", "test2");
-            controller.run("test2");
+            controller.step("test2");
             //check the UID of the new opened file
             assert controller.getSymbols("test2").get("a") == 2 + offset;
 
             // read from the prev. created file, should be 123
             controller.addStatementString("readFile(" + String.valueOf(2 + offset) + ", a)", "test2");
-            controller.run("test2");
+            controller.step("test2");
             assert controller.getSymbols("test2").get("a") == 123;
 
             controller.addStatementString("closeFile(" + String.valueOf(2 + offset) + ")", "test2");
@@ -93,7 +92,7 @@ public class FileOperationsTest {
             assert controller.getFiles("test2").getAll().get(2 + offset) == null;
             offset += 2;
 
-        } catch (SyntaxException | IOException | RepositoryException | UndefinedVariableException | UndefinedOperationException e) {
+        } catch (SyntaxException | IOException | RepositoryException | UndefinedVariableException | UndefinedOperationException | ProgramException e) {
             assert false;
         }
     }

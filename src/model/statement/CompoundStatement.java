@@ -83,7 +83,37 @@ public class CompoundStatement extends AbstractStatement {
      *          false if the string doesn't match the class
      */
     public static boolean matchesString(String statementString) {
-        return statementString.matches(compoundStatementRegex) && !statementString.contains("if") &&
-                !statementString.contains("while(") && !statementString.contains("fork(");
+        // TODO: fork(print(i));i=i=1 doesn't evaluate as a compound statement
+        return statementString.matches(compoundStatementRegex) && !statementString.contains("if") && !statementString.contains("while(") && !statementString.contains("fork(");
+        /*
+        // split by ';' and check if the number of '(' matches the number of ')' in each side
+        String[] sides = statementString.split(";");
+        if(sides.length != 2)
+            return false;
+        String first = sides[0];
+        String second = sides[1];
+        Stack<Character> s = new Stack<>();
+        boolean firstOk=false, secondOk=false;
+
+        for(int i=0; i< first.length(); i++) {
+            char tok = first.charAt(i);
+            if(tok == '(')
+                s.push(tok);
+            if(tok==')')
+                s.pop();
+        }
+        firstOk = s.empty();
+
+        for(int i=0; i< second.length(); i++) {
+            char tok = second.charAt(i);
+            if(tok == '(')
+                s.push(tok);
+            if(tok==')')
+                s.pop();
+        }
+        secondOk = s.empty();
+
+        return firstOk && secondOk && statementString.matches(compoundStatementRegex) && !statementString.contains(":");
+        */
     }
 }

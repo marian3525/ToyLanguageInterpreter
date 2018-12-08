@@ -1,5 +1,6 @@
 package tests;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.ConstantExpression;
@@ -25,8 +26,8 @@ public class PrintStatementTest {
 
         } catch (UndefinedOperationException | UndefinedVariableException e) {
             assert false;
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
+        } catch (SyntaxException e) {
+            assert false;
         }
     }
 }

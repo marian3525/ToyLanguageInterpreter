@@ -48,7 +48,7 @@ public class WriteHeapStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         Heap h = (Heap) programState.getHeap();
 
         if (h.get(programState.getSymbols().get(varName)) != null) {

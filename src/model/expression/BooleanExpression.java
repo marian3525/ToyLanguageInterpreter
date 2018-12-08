@@ -80,7 +80,7 @@ public class BooleanExpression extends AbstractExpression {
     }
 
     @Override
-    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException {
+    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
 
         switch (operator) {
             case "<":
@@ -103,4 +103,5 @@ public class BooleanExpression extends AbstractExpression {
         }
         return 0;
     }
+
 }

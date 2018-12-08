@@ -1,5 +1,6 @@
 package tests;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.ArithmeticExpression;
@@ -26,10 +27,8 @@ public class AssignmentStatementTest {
         try {
             e.execute(state);
             assert state.getSymbols().get("a") == 3;
-        } catch (UndefinedVariableException | UndefinedOperationException ex) {
+        } catch (UndefinedVariableException | UndefinedOperationException | SyntaxException ex) {
             assert false;
-        } catch (java.io.IOException e1) {
-            e1.printStackTrace();
         }
 
         e = new AssignmentStatement("b", new ArithmeticExpression(new VariableExpression("a"),
@@ -38,20 +37,16 @@ public class AssignmentStatementTest {
         try {
             e.execute(state);
             assert state.getSymbols().get("b") == 4;
-        } catch (UndefinedVariableException | UndefinedOperationException ex) {
+        } catch (UndefinedVariableException | UndefinedOperationException | SyntaxException ex) {
             assert false;
-        } catch (java.io.IOException e1) {
-            e1.printStackTrace();
         }
 
         e = new AssignmentStatement("a", new ConstantExpression(-1));
         try {
             e.execute(state);
             assert state.getSymbols().get("a") == -1;
-        } catch (UndefinedVariableException | UndefinedOperationException ex) {
+        } catch (UndefinedVariableException | UndefinedOperationException | SyntaxException ex) {
             assert false;
-        } catch (java.io.IOException e1) {
-            e1.printStackTrace();
         }
 
     }

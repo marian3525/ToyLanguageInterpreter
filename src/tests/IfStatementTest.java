@@ -1,5 +1,6 @@
 package tests;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.AbstractExpression;
@@ -52,12 +53,9 @@ public class IfStatementTest {
             n.execute(state);
             assert state.getExecutionStack().pop() == elseStatement;
 
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert false;
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
         }
-
         CompoundStatement s = new CompoundStatement(new AssignmentStatement("a", new ArithmeticExpression
                 (new VariableExpression("a"), new ConstantExpression(1), "+")),
                 new PrintStatement(new VariableExpression("a")));
@@ -72,10 +70,8 @@ public class IfStatementTest {
             //(a = a + 1;print(a)
             assert state.getExecutionStack().peek().toString().equals("(a = a+1;print(a))");
 
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert false;
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
         }
     }
 }

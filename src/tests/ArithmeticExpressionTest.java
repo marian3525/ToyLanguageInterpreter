@@ -1,5 +1,6 @@
 package tests;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.expression.ArithmeticExpression;
@@ -30,7 +31,7 @@ public class ArithmeticExpressionTest {
 
         try {
             assert e1.evaluate(state.getSymbols(), state.getHeap()) == 3;
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert false;
         }
 
@@ -41,7 +42,7 @@ public class ArithmeticExpressionTest {
 
         try {
             assert e1.evaluate(state.getSymbols(), state.getHeap()) == 3;
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert true;
         }
 
@@ -51,7 +52,7 @@ public class ArithmeticExpressionTest {
         //vars defined
         try {
             assert e2.evaluate(state.getSymbols(), state.getHeap()) == 22;
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert false;
         }
     }
@@ -68,7 +69,7 @@ public class ArithmeticExpressionTest {
             //variables not defined, should throw
             assert e1.evaluate(state.getSymbols(), state.getHeap()) == 0;
             assert false;
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert true;
         }
         state.getSymbols().put("a", 1);
@@ -77,7 +78,7 @@ public class ArithmeticExpressionTest {
         try {
             //variables defined
             assert e1.evaluate(state.getSymbols(), state.getHeap()) == 0;
-        } catch (UndefinedOperationException | UndefinedVariableException e) {
+        } catch (UndefinedOperationException | UndefinedVariableException | SyntaxException e) {
             assert false;
         }
     }
@@ -88,7 +89,7 @@ public class ArithmeticExpressionTest {
         //divide by 0
         try {
             assert e1.evaluate(state.getSymbols(), state.getHeap()) == 0;
-        } catch (UndefinedVariableException | UndefinedOperationException e) {
+        } catch (UndefinedVariableException | UndefinedOperationException | SyntaxException e) {
             assert true;
         }
     }

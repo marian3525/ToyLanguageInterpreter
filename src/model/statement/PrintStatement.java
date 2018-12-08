@@ -8,8 +8,6 @@ import model.programState.ProgramState;
 import org.intellij.lang.annotations.RegExp;
 import parsers.ExpressionParser;
 
-import java.io.IOException;
-
 public class PrintStatement extends AbstractStatement {
     private AbstractExpression expression;
     @RegExp
@@ -55,7 +53,7 @@ public class PrintStatement extends AbstractStatement {
         return "print(" + expression.toString() + ")";
     }
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         programState.getOutput().add(Integer.toString(expression.evaluate(programState.getSymbols(), programState.getHeap())));
         return null;
     }

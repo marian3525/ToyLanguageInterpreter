@@ -9,8 +9,6 @@ import org.intellij.lang.annotations.RegExp;
 import parsers.ExpressionParser;
 import parsers.StatementParser;
 
-import java.io.IOException;
-
 public class IfStatement extends AbstractStatement {
     private AbstractExpression condition;
     private AbstractStatement thenStatement;
@@ -74,7 +72,7 @@ public class IfStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         if (condition.evaluate(programState.getSymbols(), programState.getHeap()) != 0) {
             programState.getExecutionStack().push(thenStatement);
         }

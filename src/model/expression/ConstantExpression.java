@@ -4,6 +4,7 @@ import model.interfaces.HeapInterface;
 import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ConstantExpression extends AbstractExpression {
     private int value;
@@ -21,5 +22,9 @@ public class ConstantExpression extends AbstractExpression {
     @Override
     public int evaluate(Map<String, Integer> symbols, HeapInterface heap) {
         return value;
+    }
+
+    public static boolean matchesString(String expressionStr) {
+        return Pattern.matches(constantRegex, expressionStr);
     }
 }

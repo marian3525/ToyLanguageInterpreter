@@ -1,6 +1,6 @@
 package model.util;
 
-import javafx.util.Pair;
+import model.adt.Pair;
 import model.interfaces.FileTableInterface;
 
 import java.io.*;

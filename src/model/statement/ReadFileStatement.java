@@ -59,7 +59,7 @@ public class ReadFileStatement extends AbstractStatement {
      * @throws IOException
      */
     @Override
-    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
         int descriptor = fileId.evaluate(programState.getSymbols(), programState.getHeap());
         int readValue;
         BufferedReader reader = programState.getFiles().getFile(descriptor).getValue();

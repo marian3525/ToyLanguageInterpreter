@@ -1,11 +1,13 @@
 package model.expression;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.interfaces.HeapInterface;
 import org.intellij.lang.annotations.RegExp;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class NotExpression extends AbstractExpression {
 
@@ -23,7 +25,11 @@ public class NotExpression extends AbstractExpression {
     }
 
     @Override
-    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException {
+    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         return (expression.evaluate(symbols, heap) != 0) ? 0 : 1;
+    }
+
+    public static boolean matchesString(String expressionStr) {
+        return Pattern.matches(notRegex, expressionStr);
     }
 }

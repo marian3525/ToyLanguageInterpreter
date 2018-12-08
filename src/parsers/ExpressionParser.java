@@ -28,9 +28,11 @@ public class ExpressionParser {
             case BooleanExp:
                 return BooleanExpression.buildBooleanExpressionFromString(expressionStr);
             case ReadHeapExp:
-                //already defined?
                 varName = expressionStr.split("\\(")[1].replace(")", "");
                 return new ReadHeapExpression(varName);
+            case DereferenceExpression:
+                String key = expressionStr.replace("*", "");
+                return new DereferenceExpression(key);
         }
         return null;
     }
@@ -265,17 +267,16 @@ public class ExpressionParser {
     @NotNull
     private static ExpressionType getExpressionType(@NotNull String expression) {
         //if the expression can be matched 100% of the time using the regex, don't use the postfix method
-        if (expression.matches(ConstantExpression.constantRegex)) {
+        if (ConstantExpression.matchesString(expression)) {
             return ExpressionType.ConstantExp;
-        }
-        else if (expression.matches(VariableExpression.variableRegex)) {
+        } else if (VariableExpression.matchesString(expression)) {
             return ExpressionType.VariableExp;
-        }
-        else if (expression.matches(ReadHeapExpression.readHeapExpressionRegex)) {
+        } else if (ReadHeapExpression.matchesString(expression)) {
             return ExpressionType.ReadHeapExp;
-        }
-        else if (expression.matches(NotExpression.notRegex)) {
+        } else if (NotExpression.matchesString(expression)) {
             return ExpressionType.NotExp;
+        } else if (DereferenceExpression.matchesString(expression)) {
+            return ExpressionType.DereferenceExpression;
         }
 
         //apply the postfix method only on more complex expressions: boolean and arithmetic exprs
@@ -298,5 +299,8 @@ public class ExpressionParser {
         return ExpressionType.UndefinedExp;
     }
 
-    private enum ExpressionType {ConstantExp, VariableExp, ArithmeticExp, BooleanExp, NotExp, ReadHeapExp, UndefinedExp}
+    private enum ExpressionType {
+        ConstantExp, VariableExp, ArithmeticExp, BooleanExp, NotExp, ReadHeapExp,
+        DereferenceExpression, UndefinedExp
+    }
 }

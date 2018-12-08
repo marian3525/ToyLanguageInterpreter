@@ -1,8 +1,8 @@
 package controller;
 
 import exceptions.*;
-import javafx.util.Pair;
 import model.adt.Heap;
+import model.adt.Pair;
 import model.programState.ProgramState;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
@@ -59,14 +59,13 @@ public class Controller {
      * @throws UndefinedVariableException   if an previously undefined variable is found on the rhs of an expression
      */
     public void run(String progName) throws RepositoryException, UndefinedVariableException, UndefinedOperationException, IOException, SyntaxException {
-        ProgramState state = repo.getProgramByName(progName);
         while (true) {
             try {
                 step(progName);
             } catch (ProgramException pe) {
                 //end of program reached
                 //clean up the files left opened
-                //closeFiles(progName);
+                closeFiles(progName);
                 break;
             }
         }

@@ -9,7 +9,6 @@ import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import parsers.ExpressionParser;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Stack;
 
@@ -40,7 +39,7 @@ public class AssignmentStatement extends AbstractStatement {
     }
 
     @Override
-    public ProgramState execute(@NotNull ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException {
+    public ProgramState execute(@NotNull ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
 
         Stack<AbstractStatement> stack = programState.getExecutionStack();
         Map<String, Integer> symbols = programState.getSymbols();

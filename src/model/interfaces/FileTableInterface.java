@@ -1,6 +1,6 @@
 package model.interfaces;
 
-import javafx.util.Pair;
+import model.adt.Pair;
 
 import java.io.BufferedReader;
 import java.io.IOException;

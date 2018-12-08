@@ -1,5 +1,6 @@
 package model.expression;
 
+import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import model.interfaces.HeapInterface;
@@ -41,7 +42,7 @@ public class ArithmeticExpression extends AbstractExpression {
     }
 
     @Override
-    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException {
+    public int evaluate(Map<String, Integer> symbols, HeapInterface heap) throws UndefinedOperationException, UndefinedVariableException, SyntaxException {
         switch(op) {
             case "+":
                 return first.evaluate(symbols, heap) + second.evaluate(symbols, heap);

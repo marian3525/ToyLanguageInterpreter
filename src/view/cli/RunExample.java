@@ -1,4 +1,4 @@
-package view;
+package view.cli;
 
 import controller.Controller;
 import exceptions.RepositoryException;
