@@ -1,6 +1,6 @@
 package tests;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
@@ -14,11 +14,11 @@ import java.io.IOException;
 
 
 public class BooleanExpressionTest {
-    Controller c;
+    ExecutionController c;
 
     @Before
     public void setUp() throws RepositoryException {
-        c = new Controller();
+        c = new ExecutionController();
         c.addEmptyProgram("test");
     }
 

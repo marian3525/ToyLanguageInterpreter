@@ -1,6 +1,6 @@
 package tests;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.*;
 import model.expression.ConstantExpression;
 import model.statement.CloseFileStatement;
@@ -14,13 +14,13 @@ import java.io.*;
 
 public class FileOperationsTest {
     private final String path = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles";
-    private Controller controller;
+    private ExecutionController controller;
     private static int offset = 0; // needed for multiple tests execute in a row
 
 
     @Before
     public void setUp() throws IOException, RepositoryException {
-        controller = new Controller();
+        controller = new ExecutionController();
         //create 2 test files
         new BufferedWriter(new FileWriter(path + "\\" + "testFile1.txt")).close();
         new BufferedWriter(new FileWriter(path + "\\" + "testFile2.txt")).close();

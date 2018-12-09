@@ -1,6 +1,6 @@
 package view.cli;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.*;
 import view.UI;
 
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class CLI implements UI {
-    private Controller controller;
+    private ExecutionController controller;
     //execution flags
     private boolean quitting = false;
     private String progName = "";
@@ -17,7 +17,7 @@ public class CLI implements UI {
     private boolean multithreaded = false;
 
     public CLI() {
-        controller = new Controller();
+        controller = new ExecutionController();
         System.out.println("Started CLI");
     }
 

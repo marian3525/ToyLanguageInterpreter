@@ -20,11 +20,11 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
-public class Controller {
+public class ExecutionController {
     private RepositoryInterface repo;
     private ExecutorService executorService;
 
-    public Controller() {
+    public ExecutionController() {
         repo = new Repository();
     }
 

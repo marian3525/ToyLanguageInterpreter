@@ -1,6 +1,6 @@
 package view.cli;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
@@ -9,10 +9,10 @@ import exceptions.UndefinedVariableException;
 import java.io.IOException;
 
 public class RunExample extends Command {
-    private Controller controller;
+    private ExecutionController controller;
     private String progName;
 
-    public RunExample(String key, String desc, Controller controller, String progName) {
+    public RunExample(String key, String desc, ExecutionController controller, String progName) {
         super(key, desc);
         this.controller = controller;
         this.progName = progName;

@@ -1,6 +1,6 @@
 package tests;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.*;
 import org.junit.After;
 import org.junit.Before;
@@ -10,11 +10,11 @@ import java.io.IOException;
 import java.util.Map;
 
 public class ControllerTest {
-    Controller c;
+    ExecutionController c;
 
     @Before
     public void setUp() {
-        c = new Controller();
+        c = new ExecutionController();
     }
 
     @After
@@ -23,7 +23,7 @@ public class ControllerTest {
 
     @Test
     public void step() throws UndefinedVariableException, UndefinedOperationException, SyntaxException, RepositoryException, IOException, ProgramException {
-        Controller controller = new Controller();
+        ExecutionController controller = new ExecutionController();
         controller.addEmptyProgram("test");
 
         assert(controller.getOutput("test").size()==0);
@@ -82,7 +82,7 @@ public class ControllerTest {
 
     @Test
     public void addEmptyProgram() {
-        Controller c = new Controller();
+        ExecutionController c = new ExecutionController();
         //attempt to get output of nonexistent program, should throw
         try {
             assert c.getOutput("prog") != null;

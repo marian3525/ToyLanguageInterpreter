@@ -1,6 +1,6 @@
 package tests;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
@@ -12,11 +12,11 @@ import org.junit.Test;
 import java.io.IOException;
 
 public class NewEntryStatementTest {
-    Controller c;
+    ExecutionController c;
 
     @Before
     public void setUp() {
-        c = new Controller();
+        c = new ExecutionController();
     }
 
     @Test

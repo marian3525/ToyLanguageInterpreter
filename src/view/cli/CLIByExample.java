@@ -1,6 +1,6 @@
 package view.cli;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import view.UI;
@@ -11,12 +11,12 @@ import java.util.Scanner;
 
 public class CLIByExample implements UI {
     private Map<String, Command> commands;
-    private Controller controller;
+    private ExecutionController controller;
 
     public CLIByExample() throws RepositoryException, SyntaxException {
         commands = new HashMap<>();
 
-        Controller controller = new Controller();
+        ExecutionController controller = new ExecutionController();
         controller.addEmptyProgram("example1");
         controller.addStatementString("print(a)", "example1");
         controller.addStatementString("closeFile(1)", "example1");
@@ -30,14 +30,14 @@ public class CLIByExample implements UI {
         controller.addStatementString("readFile(var_f,var_c);print(var_c)", "example2");
         controller.addStatementString("openFile(var_f,file.txt)", "example2");
 
-        Controller controllerThreaded = new Controller();
+        ExecutionController controllerThreaded = new ExecutionController();
         controllerThreaded.addEmptyProgram("threadsMain");
         controllerThreaded.addStatementString("print(readHeap(a))", "threadsMain");
         controllerThreaded.addStatementString("print(a);a=a;a=a;a=a", "threadsMain");
         controllerThreaded.addStatementString("fork(a=2;print(a);new(addr, 10))", "threadsMain");
         controllerThreaded.addStatementString("a=1;print(a)", "threadsMain");
 
-        Controller controllerWhile = new Controller();
+        ExecutionController controllerWhile = new ExecutionController();
         controllerWhile.addEmptyProgram("forkthread");
         //controllerWhile.addStatementString("while(i<10): fork(print(i));i=i+1", "forkthread");
         controllerWhile.addStatementString("i=0", "forkthread");

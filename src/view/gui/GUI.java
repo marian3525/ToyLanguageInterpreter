@@ -22,9 +22,9 @@ public class GUI extends Application implements UI {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("config.fxml"));
-        primaryStage.setTitle("Hello Word");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        Parent root = FXMLLoader.load(getClass().getResource("ui.fxml"));
+        primaryStage.setTitle("Toy Language Interpreter");
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

@@ -1,6 +1,6 @@
 package tests;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.*;
 import model.expression.ConstantExpression;
 import model.programState.ProgramState;
@@ -14,11 +14,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ForkStatementTest {
-    Controller c;
+    ExecutionController c;
 
     @Before
     public void setUp() throws RepositoryException {
-        c = new Controller();
+        c = new ExecutionController();
         c.addEmptyProgram("test");
     }
 
@@ -48,7 +48,7 @@ public class ForkStatementTest {
 
     @Test
     public void testExecuteThroughController() throws RepositoryException, SyntaxException, UndefinedVariableException, IOException, UndefinedOperationException, InterruptedException {
-        Controller c = new Controller();
+        ExecutionController c = new ExecutionController();
         c.addEmptyProgram("test");
         ArrayList<String> progs = new ArrayList<>();
         progs.add("test");

@@ -1,6 +1,6 @@
 package tests;
 
-import controller.Controller;
+import controller.ExecutionController;
 import exceptions.RepositoryException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
@@ -11,11 +11,11 @@ import org.junit.Test;
 import java.io.IOException;
 
 public class WhileStatementTest {
-    Controller c;
+    ExecutionController c;
 
     @Before
     public void setUp() throws RepositoryException {
-        c = new Controller();
+        c = new ExecutionController();
         c.addEmptyProgram("test");
     }
 
