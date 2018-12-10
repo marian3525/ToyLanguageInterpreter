@@ -9,11 +9,13 @@ import model.adt.Heap;
 import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
+import model.util.Observable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.*;
 
-public class ProgramState {
+public class ProgramState extends Observable {
     private Stack<AbstractStatement> executionStack;
     private Map<String, Integer> symbols;
     private Vector<String> output;
@@ -25,6 +27,9 @@ public class ProgramState {
     private boolean functionFinished;
 
     public ProgramState() {
+        // init the Observable
+        super();
+
         executionStack = new Stack<>();
         symbols = new HashMap<>();
         output = new Vector<>(10);
@@ -38,7 +43,7 @@ public class ProgramState {
      * Copy constructor: copy the symbols. Copy the reference to the heap, filetable and output
      * Used by forkStatement
      */
-    public ProgramState(ProgramState source) {
+    public ProgramState(@NotNull ProgramState source) {
         executionStack = new Stack<>();
         symbols = new HashMap<>();
 
@@ -93,6 +98,7 @@ public class ProgramState {
 
     public void setFunctionFinished(boolean finished) {
         this.functionFinished = finished;
+        notifyObservers();
     }
 
     public int getId() {
@@ -111,8 +117,13 @@ public class ProgramState {
         } catch (EmptyStackException ese) {
             throw new ProgramException("End of program reached");
         }
-        if (top != null)
-            return top.execute(this);
+        if (top != null) {
+            ProgramState ret = top.execute(this);
+            // notify the repo
+            notifyObservers();
+            return ret;
+        }
+
         else
             return null;
     }

@@ -3,8 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.*?>
-<Pane fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="809.0" prefWidth="1011.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1"
+<Pane xmlns:fx="http://javafx.com/fxml/1" fx:id="pane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="809.0" prefWidth="1011.0" xmlns="http://javafx.com/javafx/10.0.1"
       fx:controller="controller.GUIController">
     <children>
         <TextArea fx:id="historyTextArea" layoutX="88.0" layoutY="470.0" prefHeight="257.0" prefWidth="436.0"/>
@@ -27,17 +27,13 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <TextField fx:id="inputTextField" layoutX="14.0" layoutY="727.0" prefHeight="50.0" prefWidth="510.0"/>
-        <Label layoutX="14.0" layoutY="443.0" text="History:">
+        <TextField fx:id="inputTextField" layoutX="88.0" layoutY="727.0" prefHeight="50.0" prefWidth="436.0"/>
+        <Label layoutX="14.0" layoutY="470.0" text="History:">
             <font>
                 <Font size="15.0"/>
             </font>
         </Label>
-        <ListView fx:id="stackList" layoutX="549.0" layoutY="359.0" prefHeight="257.0" prefWidth="200.0"/>
-        <ListView fx:id="fileList" layoutX="797.0" layoutY="110.0" prefHeight="200.0" prefWidth="200.0"/>
-        <ListView fx:id="symbolList" layoutX="797.0" layoutY="359.0" prefHeight="257.0" prefWidth="200.0"/>
-        <ListView fx:id="heapList" layoutX="549.0" layoutY="110.0" prefHeight="200.0" prefWidth="200.0"/>
-        <Label layoutX="549.0" layoutY="639.0" text="Output:">
+        <Label layoutX="534.0" layoutY="569.0" text="Output:">
             <font>
                 <Font size="15.0"/>
             </font>
@@ -52,7 +48,7 @@
                 <Font size="15.0"/>
             </font>
         </Label>
-        <Label layoutX="548.0" layoutY="84.0" text="Heap:">
+        <Label layoutX="524.0" layoutY="84.0" text="Heap:">
             <font>
                 <Font size="15.0"/>
             </font>
@@ -62,7 +58,30 @@
                 <Font size="15.0"/>
             </font>
         </Label>
-        <TextArea fx:id="outputTextArea" layoutX="549.0" layoutY="663.0" prefHeight="114.0" prefWidth="450.0"/>
-        <ComboBox fx:id="programComboBox" layoutX="374.0" layoutY="440.0" prefWidth="150.0"/>
+        <TableView fx:id="heapTable" layoutX="524.0" layoutY="111.0" prefHeight="200.0" prefWidth="200.0"/>
+        <TableView fx:id="fileTable" layoutX="750.0" layoutY="111.0" prefHeight="200.0" prefWidth="200.0"/>
+        <TableView fx:id="symbolTable" layoutX="750.0" layoutY="353.0" prefHeight="200.0" prefWidth="200.0"/>
+        <ListView fx:id="outputList" layoutX="534.0" layoutY="591.0" prefHeight="185.0" prefWidth="107.0"/>
+        <TextField fx:id="progStatesCount" editable="false" layoutX="234.0" layoutY="41.0" prefHeight="26.0"
+                   prefWidth="36.0"/>
+        <Label layoutX="14.0" layoutY="44.0" text="Number of program States:">
+            <font>
+                <Font size="16.0"/>
+            </font>
+        </Label>
+        <ListView fx:id="progStatesList" layoutX="14.0" layoutY="103.0" prefHeight="159.0" prefWidth="137.0"/>
+        <Label layoutX="14.0" layoutY="74.0" text="Program States:">
+            <font>
+                <Font size="17.0"/>
+            </font>
+        </Label>
+        <Button fx:id="stepButton" layoutX="93.0" layoutY="262.0" mnemonicParsing="false" text="Step"/>
+        <Button fx:id="runButton" layoutX="14.0" layoutY="262.0" mnemonicParsing="false" text="Run"/>
+        <Label layoutX="14.0" layoutY="727.0" text="Command:">
+            <font>
+                <Font size="14.0"/>
+            </font>
+        </Label>
+        <ListView fx:id="executionList" layoutX="524.0" layoutY="353.0" prefHeight="200.0" prefWidth="200.0"/>
     </children>
 </Pane>

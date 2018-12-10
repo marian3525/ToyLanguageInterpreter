@@ -67,7 +67,7 @@ public class ExpressionParser {
             }
             // 2 char operator
             else if (operators.contains(new StringBuilder().append(current).append(next).toString())) {
-                out.add(String.valueOf(current) + String.valueOf(next));
+                out.add(String.valueOf(current) + next);
             }
             //if a letter, start building a var name OR FUNCTION NAME!
             else if (Character.isLetterOrDigit(current) && nameBuilder.length() > 0 || Character.isLetter(current)) {
@@ -144,7 +144,7 @@ public class ExpressionParser {
             {
                 while (!stack.isEmpty() && priority(c) <= priority(stack.peek()))
                     output.add(stack.pop());
-                stack.push(String.valueOf(c));
+                stack.push(c);
             }
         }
 

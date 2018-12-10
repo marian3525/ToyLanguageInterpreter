@@ -1,22 +1,25 @@
 package controller;
 
 import exceptions.*;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import model.adt.Pair;
 import model.util.FileTable;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
-public class GUIController implements Initializable {
-    ExecutionController executionController;
+public class GUIController implements Initializable, model.util.Observer {
+
+    private ExecutionController executionController;
 
     //members to be injected
     @FXML
@@ -26,20 +29,26 @@ public class GUIController implements Initializable {
     @FXML
     private TextField inputTextField;
     @FXML
-    private ListView<String> heapList;
+    private TableView<Map.Entry<Integer, Integer>> heapTable;
     @FXML
-    private ListView<String> fileList;
+    private TableView<Map.Entry<Integer, Pair<String, BufferedReader>>> fileTable;
     @FXML
-    private ListView<String> stackList;
+    private TableView<Map.Entry<String, Integer>> symbolTable;
     @FXML
-    private ListView<String> symbolList;
+    private ListView<String> executionList;
     @FXML
-    private TextArea outputTextArea;
+    private ListView<String> outputList;
     @FXML
-    private ComboBox<String> programComboBox;
+    private TextField progStatesCount;
+    @FXML
+    private ListView<String> progStatesList;
+    @FXML
+    private Button runButton;
+    @FXML
+    private Button stepButton;
 
     // execution flags, modified through commands starting with '!'
-    private String progName = "";
+    private String currentProg = "";
     private boolean autorun = false;
     private boolean multithreaded = false;
     private boolean quiet = false;
@@ -48,7 +57,8 @@ public class GUIController implements Initializable {
      * Called before the @FXML annotated objects are injected.
      */
     public GUIController() {
-        executionController = new ExecutionController();
+        //create the execution controller and register this object on the Observers list
+        executionController = new ExecutionController(this);
     }
 
     /**
@@ -60,6 +70,7 @@ public class GUIController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         bindActions();
         configure();
+        update();
     }
 
     /**
@@ -70,56 +81,105 @@ public class GUIController implements Initializable {
         inputTextField.setOnAction(event -> onConsoleLineEntered(inputTextField.getText()));
     }
 
+    @SuppressWarnings("unchecked")
     private void configure() {
+        // output only views
         historyTextArea.setEditable(false);
-        heapList.setEditable(false);
-        fileList.setEditable(false);
-        stackList.setEditable(false);
-        symbolList.setEditable(false);
-        outputTextArea.setEditable(false);
+        heapTable.setEditable(false);
+        fileTable.setEditable(false);
+        symbolTable.setEditable(false);
+        executionList.setEditable(false);
+        outputList.setEditable(false);
+        progStatesCount.setEditable(false);
+        progStatesList.setEditable(false);
+
+        // configure the buttons
+        runButton.setOnAction(event -> runProgram(currentProg, false));
+        stepButton.setOnAction(event -> stepProgram(currentProg, false));
+
+        progStatesList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        //configure the tables with the required columns
+
+        // config for the heapTable
+        TableColumn<Map.Entry<Integer, Integer>, Integer> addressColumn = new TableColumn<>("Address");
+        addressColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getKey()));
+
+        TableColumn<Map.Entry<Integer, Integer>, Integer> valueColumn = new TableColumn<>("Value");
+        valueColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
+
+        heapTable.getColumns().addAll(addressColumn, valueColumn);
+
+        // config the file table
+        TableColumn<Map.Entry<Integer, Pair<String, BufferedReader>>, Integer> descriptorColumn = new TableColumn<>("Descriptor");
+        descriptorColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getKey()));
+
+        TableColumn<Map.Entry<Integer, Pair<String, BufferedReader>>, String> fileColumn = new TableColumn<>("File");
+        fileColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue().getKey()));
+
+        fileTable.getColumns().addAll(descriptorColumn, fileColumn);
+
+        // symbol table
+        TableColumn<Map.Entry<String, Integer>, String> variableNameColumn = new TableColumn("Variable Name");
+        variableNameColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getKey()));
+
+        TableColumn<Map.Entry<String, Integer>, Integer> varValueColumn = new TableColumn("Value");
+        varValueColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
+
+        symbolTable.getColumns().addAll(variableNameColumn, varValueColumn);
     }
 
     private void log(String message) {
         historyTextArea.appendText(">" + message + System.lineSeparator());
     }
 
+    /**
+     * Update the views if the currently shown program is progName
+     * Else, do nothing
+     *
+     * @param progName the program whose data needs to be updated
+     */
     private void updateViews(String progName) {
+
+        // variables to store the updated state of the current program
         Map<Integer, Integer> heap;
         FileTable files;
         Vector<String> stack;
         Map<String, Integer> symbols;
         Vector<String> output;
-
+        Set<String> progStates;
+        // attempt to get updated values
         try {
             heap = executionController.getHeap(progName).getAll();
             files = executionController.getFiles(progName);
             stack = executionController.getStackString(progName);
             symbols = executionController.getSymbols(progName);
             output = executionController.getOutput(progName);
-
+            progStates = executionController.getAllStates().keySet();
         } catch (RepositoryException e) {
             log(e.getMessage());
             return;
         }
-        ObservableList<String> heapObs = FXCollections.observableArrayList(
-                heap.entrySet().stream().map(e -> e.getKey().toString() + e.getValue().toString()).collect(Collectors.toList()));
-        ObservableList<String> filesObs = FXCollections.observableArrayList(
-                files.getAll().entrySet().stream().map(e -> e.getKey().toString() + "->" + e.getValue().toString()).collect(Collectors.toList()));
+        currentProg = progStatesList.getSelectionModel().getSelectedItem();
 
-        ObservableList<String> stackObs = FXCollections.observableArrayList(stack);
+        heapTable.setItems(FXCollections.observableArrayList(heap.entrySet()));
+        heapTable.refresh();
 
-        ObservableList<String> symbolsObs = FXCollections.observableArrayList(
-                symbols.entrySet().stream().map(e -> e.getKey() + "->" + e.getValue().toString()).collect(Collectors.toList()));
-        StringBuilder outputStr = new StringBuilder();
-        for (String elem : output) {
-            outputStr.append(elem).append(" ");
-        }
+        fileTable.setItems(FXCollections.observableArrayList(files.getAll().entrySet()));
+        fileTable.refresh();
 
-        heapList.setItems(heapObs);
-        fileList.setItems(filesObs);
-        stackList.setItems(stackObs);
-        symbolList.setItems(symbolsObs);
-        outputTextArea.setText(outputStr.toString());
+        symbolTable.setItems(FXCollections.observableArrayList(symbols.entrySet()));
+        symbolTable.refresh();
+
+        executionList.setItems(FXCollections.observableArrayList(stack));
+        executionList.refresh();
+
+        outputList.setItems(FXCollections.observableArrayList(output));
+        outputList.refresh();
+
+        progStatesList.setItems(FXCollections.observableArrayList(progStates));
+        progStatesList.refresh();
+        progStatesCount.textProperty().setValue(String.valueOf(progStates.size()));
     }
 
     private void onConsoleLineEntered(String line) {
@@ -142,12 +202,12 @@ public class GUIController implements Initializable {
                 //set program name, name should be in parts[1]
                 if (parts.length > 1)
                     if (parts[1].length() >= 1) {
-                        progName = parts[1];
+                        currentProg = parts[1];
                         try {
-                            executionController.addEmptyProgram(progName);
+                            executionController.addEmptyProgram(currentProg);
                         } catch (RepositoryException e) {
                             //the program with the given name already exists, so it was already created, do nothing
-                            log("A program with the name: '" + progName + "' already exists");
+                            log("A program with the name: '" + currentProg + "' already exists");
                         }
                         return;
                     }
@@ -162,9 +222,9 @@ public class GUIController implements Initializable {
                 //default config: view true, progName = prog, autorun true
                 quiet = false;
                 multithreaded = false;
-                progName = "prog";
+                currentProg = "prog";
                 try {
-                    executionController.addEmptyProgram(progName);
+                    executionController.addEmptyProgram(currentProg);
                 } catch (RepositoryException e) {
                     log("Default program name taken, no new program was created");
                 }
@@ -177,25 +237,26 @@ public class GUIController implements Initializable {
                 return;
             case "!mt":
                 multithreaded = !multithreaded;
-                log("Multithreading set to " + multithreaded);
+                log("Multi-threading set to " + multithreaded);
                 return;
             case "!help":
                 log("Use the Help menu for more info");
             case "!step":
-                stepProgram(progName, quiet);
+                stepProgram(currentProg, quiet);
                 return;
             case "!run":
-                runProgram(progName, quiet);
+                runProgram(currentProg, quiet);
                 return;
         }
 
         //it is an instruction, add it to the current program
+        //TODO, currentprog is null on fork()
         try {
-            executionController.addStatementString(line, progName);
+            executionController.addStatementString(line, currentProg);
             if (autorun) {
-                runProgram(progName, quiet);
+                runProgram(currentProg, quiet);
             }
-            updateViews(progName);
+            updateViews(currentProg);
         } catch (RepositoryException e) {
             log(e.getMessage());
         } catch (SyntaxException e) {
@@ -259,4 +320,14 @@ public class GUIController implements Initializable {
         }
     }
 
+    /**
+     * Called form the Observable Repo when changed occur
+     */
+    @Override
+    public void update() {
+        for (String progName : executionController.getRepo().getPrograms().keySet()) {
+            log("update from Observable received");
+            updateViews(progName);
+        }
+    }
 }

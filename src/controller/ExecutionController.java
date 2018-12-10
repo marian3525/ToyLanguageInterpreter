@@ -6,6 +6,7 @@ import model.adt.Pair;
 import model.programState.ProgramState;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
+import model.util.Observer;
 import org.jetbrains.annotations.NotNull;
 import parsers.StatementParser;
 import repository.Repository;
@@ -26,6 +27,11 @@ public class ExecutionController {
 
     public ExecutionController() {
         repo = new Repository();
+    }
+
+    public ExecutionController(Observer o) {
+        repo = new Repository();
+        ((Repository) repo).registerObserver(o);
     }
 
     /**
@@ -190,6 +196,10 @@ public class ExecutionController {
 
     public Heap getHeap(String progName) throws RepositoryException {
         return (Heap) repo.getProgramByName(progName).getHeap();
+    }
+
+    public RepositoryInterface getRepo() {
+        return repo;
     }
 
     public Map<String, ProgramState> getAllStates() {

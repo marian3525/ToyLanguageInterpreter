@@ -57,11 +57,11 @@ public class FileOperationsTest {
             assert controller.getSymbols("test1").get("a") == 1 + offset;
 
             // read from an empty file, should read 0
-            controller.addStatementString("readFile(" + String.valueOf(1 + offset) + ", a)", "test1");
+            controller.addStatementString("readFile(" + (1 + offset) + ", a)", "test1");
             controller.step("test1");
             assert controller.getSymbols("test1").get("a") == 0;
 
-            controller.addStatementString("closeFile(" + String.valueOf(1 + offset) + ")", "test1");
+            controller.addStatementString("closeFile(" + (1 + offset) + ")", "test1");
             controller.run("test1");
             //check that the file with the UID 1 has been removed from the fileTable
             assert controller.getFiles("test1").getAll().get(1) == null;
@@ -82,11 +82,11 @@ public class FileOperationsTest {
             assert controller.getSymbols("test2").get("a") == 2 + offset;
 
             // read from the prev. created file, should be 123
-            controller.addStatementString("readFile(" + String.valueOf(2 + offset) + ", a)", "test2");
+            controller.addStatementString("readFile(" + (2 + offset) + ", a)", "test2");
             controller.step("test2");
             assert controller.getSymbols("test2").get("a") == 123;
 
-            controller.addStatementString("closeFile(" + String.valueOf(2 + offset) + ")", "test2");
+            controller.addStatementString("closeFile(" + (2 + offset) + ")", "test2");
             controller.run("test2");
             //check that the file with the UID 1 has been removed from the fileTable
             assert controller.getFiles("test2").getAll().get(2 + offset) == null;

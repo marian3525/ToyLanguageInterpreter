@@ -71,7 +71,7 @@ public class AssignmentStatement extends AbstractStatement {
         //then it has the syntax: var_name=const_value OR var_name = another_var OR var_name = arith_expr
         //remove the ';' and split by '='
         input = input.replace(";", "");
-        String sides[] = input.split("=", 2);  //split by the first = only
+        String[] sides = input.split("=", 2);  //split by the first = only
         String varName = sides[0].replace(" ", "");      //there will always be exactly one variable in the lhs
 
         AbstractExpression rhsExp = ExpressionParser.getExpressionFromString(sides[1]);

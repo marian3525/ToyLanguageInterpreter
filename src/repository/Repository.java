@@ -3,6 +3,8 @@ package repository;
 import exceptions.RepositoryException;
 import model.programState.ProgramState;
 import model.statement.AbstractStatement;
+import model.util.Observable;
+import model.util.Observer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -14,11 +16,13 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-public class Repository implements RepositoryInterface {
-    private String logPath = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles\\log.txt";
+public class Repository extends Observable implements RepositoryInterface, Observer {
+    private String logPath = "log.txt";
+    // The repo observes all the program states and it is itself observed by the GUI controller
     private Map<String, ProgramState> progs;
 
     public Repository() {
+        super();
         progs = new HashMap<>();
         try {
             //clear the file
@@ -34,6 +38,8 @@ public class Repository implements RepositoryInterface {
         }
         else {
             progs.put(progName, programState);
+            programState.registerObserver(this);
+            notifyObservers();
         }
     }
 
@@ -105,6 +111,7 @@ public class Repository implements RepositoryInterface {
     @Override
     public void setPrograms(Map<String, ProgramState> newPrograms) {
         progs = newPrograms;
+        notifyObservers();
     }
 
     /**
@@ -173,5 +180,11 @@ public class Repository implements RepositoryInterface {
         stringMap.put("heap", heapString);
 
         return stringMap;
+    }
+
+    @Override
+    public void update() {
+        // received update from one of the program states, notify the Observers higher up of the change
+        notifyObservers();
     }
 }
