@@ -53,7 +53,7 @@ public class ReturnStatement extends AbstractStatement {
 
     @Override
     public String toString() {
-        return "Return from: " + functionName + " with " + value;
+        return "return("+value+")";
     }
 
     @Override

@@ -44,7 +44,7 @@ public class WriteHeapStatement extends AbstractStatement {
 
     @Override
     public String toString() {
-        return "Write to heap at address given by: " + varName;
+        return "writeHeap(" + varName+")";
     }
 
     @Override

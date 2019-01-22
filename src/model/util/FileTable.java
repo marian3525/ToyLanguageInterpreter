@@ -26,11 +26,11 @@ public class FileTable implements FileTableInterface {
         descriptor++;
 
         //create the file if it doesn't exist
-        File f = new File(path + "\\" + filename);
+        File f = new File(path + "" + filename);
         if (!f.exists() || f.isDirectory()) {
-            new BufferedWriter(new FileWriter(path + "\\" + filename)).close();
+            new BufferedWriter(new FileWriter(path + "" + filename)).close();
         }
-        BufferedReader reader = new BufferedReader(new FileReader(path + "\\" + filename));
+        BufferedReader reader = new BufferedReader(new FileReader(path + "" + filename));
         Pair<String, BufferedReader> entry =  new Pair<>(filename, reader);
         files.put(descriptor, entry);
         return descriptor;

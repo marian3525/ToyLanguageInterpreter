@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class GUIController implements Initializable, model.util.Observer {
 
@@ -39,7 +40,7 @@ public class GUIController implements Initializable, model.util.Observer {
     @FXML
     private ListView<String> outputList;
     @FXML
-    private TextField progStatesCount;
+    private Label progStatesCount;
     @FXML
     private ListView<String> progStatesList;
     @FXML
@@ -48,21 +49,21 @@ public class GUIController implements Initializable, model.util.Observer {
     private Button stepButton;
 
     // execution flags, modified through commands starting with '!'
-    private String currentProg = "";
+    private String currentProg = "main";
     private boolean autorun = false;
-    private boolean multithreaded = false;
+    private boolean multithreaded = true;
     private boolean quiet = false;
 
+    private SelectionController selectionController;
     /**
      * Called before the @FXML annotated objects are injected.
      */
     public GUIController() {
-        //create the execution controller and register this object on the Observers list
-        executionController = new ExecutionController(this);
+        this.executionController = new ExecutionController(this);
     }
 
     /**
-     * Called after @FXML objects are injected
+     * Called after @FXML objects are injected and the constructor is called
      *
      * @param location
      * @param resources
@@ -90,14 +91,18 @@ public class GUIController implements Initializable, model.util.Observer {
         symbolTable.setEditable(false);
         executionList.setEditable(false);
         outputList.setEditable(false);
-        progStatesCount.setEditable(false);
         progStatesList.setEditable(false);
 
         // configure the buttons
         runButton.setOnAction(event -> runProgram(currentProg, false));
         stepButton.setOnAction(event -> stepProgram(currentProg, false));
 
+        // list click handler!
         progStatesList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        progStatesList.setOnMouseClicked(mouseEvent -> {
+            currentProg = progStatesList.getSelectionModel().getSelectedItem();
+            updateViews(currentProg);
+        });
 
         //configure the tables with the required columns
 
@@ -134,6 +139,15 @@ public class GUIController implements Initializable, model.util.Observer {
     }
 
     /**
+     * Called form the selector window controller when a program state is selected
+     * @param currentProgram
+     */
+    void setCurrentProgram(String currentProgram) {
+        this.currentProg = currentProgram;
+        updateViews(currentProgram);
+    }
+
+    /**
      * Update the views if the currently shown program is progName
      * Else, do nothing
      *
@@ -141,6 +155,8 @@ public class GUIController implements Initializable, model.util.Observer {
      */
     private void updateViews(String progName) {
 
+        if(!progName.equals(progName))
+            return;
         // variables to store the updated state of the current program
         Map<Integer, Integer> heap;
         FileTable files;
@@ -160,7 +176,6 @@ public class GUIController implements Initializable, model.util.Observer {
             log(e.getMessage());
             return;
         }
-        currentProg = progStatesList.getSelectionModel().getSelectedItem();
 
         heapTable.setItems(FXCollections.observableArrayList(heap.entrySet()));
         heapTable.refresh();
@@ -179,7 +194,22 @@ public class GUIController implements Initializable, model.util.Observer {
 
         progStatesList.setItems(FXCollections.observableArrayList(progStates));
         progStatesList.refresh();
-        progStatesCount.textProperty().setValue(String.valueOf(progStates.size()));
+        // set the program states list for the other window
+        Set<String> states = executionController.getAllStates().keySet().stream().map(key ->
+        {
+            try {
+                if(executionController.getAllStates().size() != 0)
+                    return key + ":" + executionController.getStackString(key);
+                else
+                    return "";
+            } catch (RepositoryException e) {
+                // can't happen, using only existing keys to access the stacks
+                return "";
+            }
+        }).collect(Collectors.toSet());
+        selectionController.setPrograms(states);
+
+        progStatesCount.setText(String.valueOf(progStates.size()));
     }
 
     private void onConsoleLineEntered(String line) {
@@ -224,7 +254,7 @@ public class GUIController implements Initializable, model.util.Observer {
                 multithreaded = false;
                 currentProg = "prog";
                 try {
-                    executionController.addEmptyProgram(currentProg);
+                    executionController.addEmptyProgram("main");
                 } catch (RepositoryException e) {
                     log("Default program name taken, no new program was created");
                 }
@@ -250,19 +280,20 @@ public class GUIController implements Initializable, model.util.Observer {
         }
 
         //it is an instruction, add it to the current program
-        //TODO, currentprog is null on fork()
         try {
-            executionController.addStatementString(line, currentProg);
+            executionController.addStatementString(line, "main");
             if (autorun) {
-                runProgram(currentProg, quiet);
+                runProgram("main", quiet);
             }
-            updateViews(currentProg);
+            updateViews("main");
         } catch (RepositoryException e) {
             log(e.getMessage());
         } catch (SyntaxException e) {
             log(e.getMessage());
         } catch (NullPointerException npe) {
             log("Parsing failed: " + npe.getMessage() + ". If you are trying to use configuration commands, make sure to use '!' in front of them");
+        } catch (ArrayIndexOutOfBoundsException eioobe) {
+            log("Parsing failed: " + eioobe.getMessage());
         }
     }
 
@@ -299,7 +330,10 @@ public class GUIController implements Initializable, model.util.Observer {
     private void stepProgram(String progName, boolean quiet) {
         try {
             System.out.println("Stepping to the next instruction");
-            executionController.step(progName);
+            if(!multithreaded)
+                executionController.step(progName);
+            else
+                executionController.stepOnAll(new Vector<>(executionController.getAllStates().keySet()));
             if (!quiet) {
                 updateViews(progName);
             }
@@ -317,6 +351,8 @@ public class GUIController implements Initializable, model.util.Observer {
             log("Syntax Exception: " + e.getMessage());
         } catch (ProgramException e) {
             log("Program Exception: " + e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -329,5 +365,16 @@ public class GUIController implements Initializable, model.util.Observer {
             log("update from Observable received");
             updateViews(progName);
         }
+    }
+
+    /**
+     *
+     * @param selectionController: controller of the selection window
+     */
+    public void setSelectorController(SelectionController selectionController) {
+        this.selectionController = selectionController;
+
+        // populate the states after all references are not null
+        executionController.populateStates();
     }
 }

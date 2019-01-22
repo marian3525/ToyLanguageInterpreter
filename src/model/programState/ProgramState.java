@@ -5,6 +5,7 @@ import exceptions.ProgramException;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import javafx.application.Platform;
 import model.adt.Heap;
 import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
@@ -120,7 +121,7 @@ public class ProgramState extends Observable {
         if (top != null) {
             ProgramState ret = top.execute(this);
             // notify the repo
-            notifyObservers();
+            Platform.runLater(this::notifyObservers);
             return ret;
         }
 

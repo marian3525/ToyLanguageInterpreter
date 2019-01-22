@@ -8,7 +8,7 @@ import model.expression.ConstantExpression;
 import model.expression.VariableExpression;
 import model.programState.ProgramState;
 import model.statement.AssignmentStatement;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AssignmentStatementTest {
 

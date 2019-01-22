@@ -10,10 +10,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Repository extends Observable implements RepositoryInterface, Observer {
@@ -83,24 +80,29 @@ public class Repository extends Observable implements RepositoryInterface, Obser
     @SuppressWarnings("unchecked")
     @Override
     public void logProgramState(ProgramState state) {
-        PrintWriter logFile = null;
+        PrintWriter logFile;
         try {
             logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath, true)));
-        } catch (IOException e) {
 
-        }
-        String[] keys = {"stack", "symbols", "output", "files", "heap"};
-        Map<String, String> stringMap = getStrings(state);
+            String[] keys = {"stack", "symbols", "output", "files", "heap"};
+            Map<String, String> stringMap = getStrings(state);
 
-        //print the name of the program with this progState:
-        String progName = progs.keySet().stream().filter(pkey -> progs.get(pkey) == state)
-                .collect(Collectors.toList()).get(0);
-        logFile.println(System.lineSeparator() + "ProgramState name: " + progName);
-        for (String key : keys) {
-            logFile.print(stringMap.get(key));
-            logFile.println("--------------------------------------------------");
-        }
-        logFile.close();
+            //print the name of the program with this progState:
+            List<String> matches = progs.keySet().stream()
+                    .filter(pkey -> progs.get(pkey) == state)
+                    .collect(Collectors.toList());
+            if(matches.size() > 0) {
+
+                String progName = matches.get(0);
+
+                logFile.println(System.lineSeparator() + "ProgramState name: " + progName);
+                for (String key : keys) {
+                    logFile.print(stringMap.get(key));
+                    logFile.println("--------------------------------------------------");
+                }
+                logFile.close();
+            }
+        } catch (IOException e) { }
     }
 
     @Override

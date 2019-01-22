@@ -3,21 +3,24 @@ package controller;
 import exceptions.*;
 import model.adt.Heap;
 import model.adt.Pair;
+import model.expression.ConstantExpression;
 import model.programState.ProgramState;
 import model.statement.AbstractStatement;
+import model.statement.CompoundStatement;
+import model.statement.PrintStatement;
 import model.util.FileTable;
 import model.util.Observer;
 import org.jetbrains.annotations.NotNull;
 import parsers.StatementParser;
 import repository.Repository;
 import repository.RepositoryInterface;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.stream.Collectors;
 
 
@@ -25,6 +28,9 @@ public class ExecutionController {
     private RepositoryInterface repo;
     private ExecutorService executorService;
 
+    /**
+     * Constructor used by the cli and tests which don't implement the observer pattern
+     */
     public ExecutionController() {
         repo = new Repository();
     }
@@ -77,7 +83,7 @@ public class ExecutionController {
         }
     }
 
-    private void stepOnAll(List<String> progNames) throws InterruptedException, RepositoryException {
+    void stepOnAll(List<String> progNames) throws InterruptedException, RepositoryException {
         // needed for testing where stepOnAll is required, but not runAll
         if (executorService == null)
             executorService = Executors.newFixedThreadPool(2);
@@ -89,7 +95,7 @@ public class ExecutionController {
         List<ProgramState> programStates = new ArrayList<>(programs.values());
 
         //print the program state before execution
-        //programStates.forEach((state)-> repo.logProgramState(state));
+        programStates.forEach((state)-> repo.logProgramState(state));
 
         //run one step concurrently on all programs in the list
         //prepare the list
@@ -98,25 +104,29 @@ public class ExecutionController {
                 .collect(Collectors.toList());
 
         //start the execution of the callables, returns a new list of progStates, threads
-        List<ProgramState> newStates = executorService.invokeAll(callList).stream()
-                .map(
-                        programStateFuture -> {
-                            try {
-                                return programStateFuture.get();
-                            } catch (Exception e) {
-                                return null;
+        try {
+            List<ProgramState> newStates = executorService.invokeAll(callList).stream()
+                    .map(
+                            programStateFuture -> {
+                                try {
+                                    return programStateFuture.get();
+                                } catch (Exception e) {
+                                    return null;
+                                }
                             }
-                        }
-                ).filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                    ).filter(Objects::nonNull)
+                    .collect(Collectors.toList());
 
-        //add the newly created threads to the old ones to be stored in the repo
-        for (ProgramState p : newStates) {
-            programs.put(String.valueOf(p.getId()), p);
+            //add the newly created threads to the old ones to be stored in the repo
+            for (ProgramState p : newStates) {
+                programs.put(String.valueOf(p.getId()), p);
+            }
+            repo.setPrograms(removeCompleted(programs));
+            //log the state
+            newStates.forEach(progState -> repo.logProgramState(progState));
+        } catch(RejectedExecutionException ree) {
+            System.out.println("Execution rejected by the Executor, no program states to run");
         }
-        repo.setPrograms(programs);
-        //log the state
-        //newStates.forEach(progState -> repo.logProgramState(progState));
     }
 
     public void runConcurrent() throws InterruptedException, RepositoryException {
@@ -165,7 +175,11 @@ public class ExecutionController {
      *
      */
     public void addStatementString(@NotNull String input, @NotNull String progName) throws SyntaxException, RepositoryException {
-
+        /**
+         * Add the statement given as a string in input to the execution stack of the program with the given name
+         * @param input: statement string
+         * @param progName: the name of the program state in which the statement will be added
+         */
         AbstractStatement s = StatementParser.getStatementFromString(input);
         repo.getProgramByName(progName).getExecutionStack().push(s);
     }
@@ -225,15 +239,16 @@ public class ExecutionController {
 
         for (String progName : inMap.keySet()) {
             try {
-                // close the files on progStates that completed execution
-                if (!repo.getProgramByName(progName).isNotCompleted())
+                // close the files on progStates that completed execution and remove it from the map
+                if (!repo.getProgramByName(progName).isNotCompleted() || progName.equals("main")) {
                     closeFiles(progName);
+                }
             } catch (RepositoryException e) {
-                e.printStackTrace();
+
             }
         }
         return inMap.entrySet().stream()
-                .filter((program) -> program.getValue().isNotCompleted())
+                .filter(program -> program.getValue().isNotCompleted())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -249,5 +264,50 @@ public class ExecutionController {
                             }
                         }
                 );
+    }
+
+    void populateStates() {
+        /**
+         * Populate the repo with program states
+         * Throws if the syntax in the string statements is incorrect or when trying to add a program name which already
+         * exists
+         */
+        // add program states with the statements given as strings
+        try {
+            addEmptyProgram("example1");
+            addStatementString("print(a)", "example1");
+            addStatementString("closeFile(1)", "example1");
+            addStatementString("readFile(a,a)", "example1");
+            addStatementString("openFile(a,file.txt)", "example1");
+
+            addEmptyProgram("example2");
+            addStatementString("closeFile(var_f)", "example2");
+            addStatementString("if var_c then readFile(var_f,var_c);print(var_c) else print(0)"
+                    , "example2");
+            addStatementString("readFile(var_f,var_c);print(var_c)", "example2");
+            addStatementString("openFile(var_f,file.txt)", "example2");
+
+            addEmptyProgram("threadsMain");
+            addStatementString("print(readHeap(a))", "threadsMain");
+            addStatementString("print(a);a=a;a=a;a=a", "threadsMain");
+            addStatementString("fork(a=2;print(a);new(addr, 10))", "threadsMain");
+            addStatementString("a=1;print(a)", "threadsMain");
+
+            addEmptyProgram("forkthread");
+            //controllerWhile.addStatementString("while(i<10): fork(print(i));i=i+1", "forkthread");
+            addStatementString("i=0", "forkthread");
+
+            addEmptyProgram("simple");
+            addStatementString("print(0)", "simple");
+
+            // add program states the ugly way
+            repo.addProgram("test", new ProgramState());
+            AbstractStatement statement = new CompoundStatement(new PrintStatement(new ConstantExpression(0)),
+                    new PrintStatement(new ConstantExpression(1)));
+            repo.getProgramByName("test").getExecutionStack().push(statement);
+        }
+        catch(SyntaxException | RepositoryException sre) {
+
+        }
     }
 }

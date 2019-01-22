@@ -48,7 +48,7 @@ public class ReadFileStatement extends AbstractStatement {
 
     @Override
     public String toString() {
-        return "Read from file: " + fileId + " into var: " + varName;
+        return "read(" + fileId + ", " + varName+")";
     }
 
     /**

@@ -137,8 +137,10 @@ public class ExpressionParser {
 
                 if (!stack.isEmpty() && !stack.peek().equals("("))
                     throw new SyntaxException("Malformed expression: " + in + " @ character: " + c);
-                else
+                else if (!stack.empty())
                     stack.pop();
+                else
+                    throw new SyntaxException("Malformed expression: " + in + " @ character: " + c);
             }
             else // an operator is encountered
             {

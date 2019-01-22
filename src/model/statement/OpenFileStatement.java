@@ -12,7 +12,7 @@ import java.io.IOException;
 public class OpenFileStatement extends AbstractStatement {
     @RegExp
     private static final String openFileStatementRegex = "^openFile\\(.*\\)$";
-    private static final String programFilesPath = "D:\\CS\\MAP\\ToyLanguageInterpreter\\outputFiles";
+    private static final String programFilesPath = "";
     private String varName;
     private String filename;
     private String functionName;
@@ -45,7 +45,7 @@ public class OpenFileStatement extends AbstractStatement {
 
     @Override
     public String toString() {
-        return "Open file: " + filename;
+        return "open(" + filename + ")";
     }
 
     @Override

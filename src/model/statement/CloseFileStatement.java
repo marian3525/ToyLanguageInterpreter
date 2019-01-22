@@ -46,7 +46,7 @@ public class CloseFileStatement extends AbstractStatement {
 
     @Override
     public String toString() {
-        return "Close file: " + fileId;
+        return "close(" + fileId + ")";
     }
 
     @Override

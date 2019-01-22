@@ -5,12 +5,12 @@ import exceptions.SyntaxException;
 import model.expression.AbstractExpression;
 import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import parsers.ExpressionParser;
 
 import java.util.Vector;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class AbstractExpressionTest {
 
