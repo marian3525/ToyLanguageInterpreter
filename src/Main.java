@@ -52,5 +52,6 @@ public class Main extends Application {
         primaryStage.setTitle("Toy Language Interpreter");
         primaryStage.setScene(new Scene(mainWindow));
         primaryStage.show();
-    }
+
+   }
 }

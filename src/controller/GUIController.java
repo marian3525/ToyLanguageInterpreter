@@ -128,8 +128,16 @@ public class GUIController implements Initializable, model.util.Observer {
         TableColumn<Map.Entry<String, Integer>, String> variableNameColumn = new TableColumn("Variable Name");
         variableNameColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getKey()));
 
-        TableColumn<Map.Entry<String, Integer>, Integer> varValueColumn = new TableColumn("Value");
+        TableColumn<Map.Entry<String, Integer>, Integer> varValueColumn = new TableColumn("Value ");
         varValueColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
+
+        /*
+        TableColumn<type given in the update> col1 = new TableColumn("col1Name");
+        col1.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getWhateverPartOfParamYouWantForThisColumn)
+        param is of type "type given in the update" from above
+        etc
+         dummyTable.getColumns().addAll(col1, col2);
+         */
 
         symbolTable.getColumns().addAll(variableNameColumn, varValueColumn);
     }
@@ -154,16 +162,12 @@ public class GUIController implements Initializable, model.util.Observer {
      * @param progName the program whose data needs to be updated
      */
     private void updateViews(String progName) {
-
-        if(!progName.equals(progName))
-            return;
         // variables to store the updated state of the current program
         Map<Integer, Integer> heap;
         FileTable files;
         Vector<String> stack;
         Map<String, Integer> symbols;
         Vector<String> output;
-        Set<String> progStates;
         // attempt to get updated values
         try {
             heap = executionController.getHeap(progName).getAll();
@@ -171,7 +175,6 @@ public class GUIController implements Initializable, model.util.Observer {
             stack = executionController.getStackString(progName);
             symbols = executionController.getSymbols(progName);
             output = executionController.getOutput(progName);
-            progStates = executionController.getAllStates().keySet();
         } catch (RepositoryException e) {
             log(e.getMessage());
             return;
@@ -191,6 +194,16 @@ public class GUIController implements Initializable, model.util.Observer {
 
         outputList.setItems(FXCollections.observableArrayList(output));
         outputList.refresh();
+
+        // dummy table
+
+
+        updateProgramLists();
+    }
+
+    private void updateProgramLists() {
+        Set<String> progStates;
+        progStates = executionController.getAllStates().keySet();
 
         progStatesList.setItems(FXCollections.observableArrayList(progStates));
         progStatesList.refresh();
@@ -362,8 +375,10 @@ public class GUIController implements Initializable, model.util.Observer {
     @Override
     public void update() {
         for (String progName : executionController.getRepo().getPrograms().keySet()) {
-            log("update from Observable received");
-            updateViews(progName);
+            log("Update from Observable received");
+            if(currentProg.equals("main") || progName.equals(currentProg))
+                updateViews(progName);
+            updateProgramLists();
         }
     }
 

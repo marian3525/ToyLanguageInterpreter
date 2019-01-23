@@ -7,6 +7,10 @@ import model.expression.ConstantExpression;
 import model.programState.ProgramState;
 import model.statement.AbstractStatement;
 import model.statement.CompoundStatement;
+import model.statement.ForkStatement;
+import model.statement.Lock.LockStatement;
+import model.statement.Lock.NewLockStatement;
+import model.statement.Lock.UnlockStatement;
 import model.statement.PrintStatement;
 import model.util.FileTable;
 import model.util.Observer;
@@ -14,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import parsers.StatementParser;
 import repository.Repository;
 import repository.RepositoryInterface;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
@@ -248,7 +253,16 @@ public class ExecutionController {
             }
         }
         return inMap.entrySet().stream()
-                .filter(program -> program.getValue().isNotCompleted())
+                // log the contents of the programs which now have an empty stack and are about to be removed
+                .filter(program -> {
+                    boolean finished = !program.getValue().isNotCompleted();
+                    if(finished) {repo.logProgramState(program.getValue());
+                    return false;
+                    }
+                    else {
+                        return true;
+                    }
+                })
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -293,10 +307,6 @@ public class ExecutionController {
             addStatementString("fork(a=2;print(a);new(addr, 10))", "threadsMain");
             addStatementString("a=1;print(a)", "threadsMain");
 
-            addEmptyProgram("forkthread");
-            //controllerWhile.addStatementString("while(i<10): fork(print(i));i=i+1", "forkthread");
-            addStatementString("i=0", "forkthread");
-
             addEmptyProgram("simple");
             addStatementString("print(0)", "simple");
 
@@ -305,8 +315,19 @@ public class ExecutionController {
             AbstractStatement statement = new CompoundStatement(new PrintStatement(new ConstantExpression(0)),
                     new PrintStatement(new ConstantExpression(1)));
             repo.getProgramByName("test").getExecutionStack().push(statement);
+
+
+            repo.addProgram("test1", new ProgramState());
+            AbstractStatement statement1 = new CompoundStatement(
+                    new NewLockStatement("a"), new CompoundStatement(
+                            new LockStatement("a"), new CompoundStatement(
+                                    new ForkStatement(new PrintStatement(new ConstantExpression(1))),
+                                    new CompoundStatement(new PrintStatement(new ConstantExpression(0)), new UnlockStatement("a")))
+            )
+            );
+            repo.getProgramByName("test1").getExecutionStack().push(statement1);
         }
-        catch(SyntaxException | RepositoryException sre) {
+        catch(SyntaxException | RepositoryException ignored) {
 
         }
     }

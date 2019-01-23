@@ -6,6 +6,7 @@ import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
 import javafx.application.Platform;
+import javafx.util.Pair;
 import model.adt.Heap;
 import model.interfaces.HeapInterface;
 import model.statement.AbstractStatement;
@@ -22,7 +23,15 @@ public class ProgramState extends Observable {
     private Vector<String> output;
     private FileTable files;
     private HeapInterface heap;
+    private Map<Integer, Integer> latchTable;
+    private Map<Integer, Integer> lockTable;
+    private Map<Integer, Pair<Integer, List<Integer>>> barrierTable;
+    private Map<Integer, Pair<Integer, List<Integer>>> semaphoreTable;
     private static int progCount = 0;       //used to assign an unique id to every progState
+    private static int latchCount = 0;
+    private static int barrierCount = 0;
+    private static int semaphoreCount = 0;
+    private static int lockCount = 0;
     private int id;
     private int lastReturn;
     private boolean functionFinished;
@@ -36,6 +45,12 @@ public class ProgramState extends Observable {
         output = new Vector<>(10);
         files = new FileTable();
         heap = new Heap();
+
+        latchTable = new HashMap<>();
+        lockTable = new HashMap<>();
+        barrierTable = new HashMap<>();
+        semaphoreTable = new HashMap<>();
+
         id = progCount;
         progCount++;
     }
@@ -45,6 +60,8 @@ public class ProgramState extends Observable {
      * Used by forkStatement
      */
     public ProgramState(@NotNull ProgramState source) {
+        super();
+
         executionStack = new Stack<>();
         symbols = new HashMap<>();
 
@@ -58,6 +75,10 @@ public class ProgramState extends Observable {
         // reference
         heap = source.heap;
         id = progCount;
+        latchTable = source.latchTable;
+        lockTable = source.lockTable;
+        barrierTable = source.barrierTable;
+        semaphoreTable=source.semaphoreTable;
         progCount++;
     }
 
@@ -82,19 +103,19 @@ public class ProgramState extends Observable {
         return heap;
     }
 
-    /**
-     * @return the return value of the last function call
-     */
-    public int getLastReturn() {
-        return lastReturn;
+    public Map<Integer, Integer> getLatchTable() {
+        return latchTable;
     }
 
-    public void setLastReturn(int lastReturn) {
-        this.lastReturn = lastReturn;
+    public Map<Integer, Integer> getLockTable() {
+        return lockTable;
     }
 
-    public boolean getFunctionFinished() {
-        return functionFinished;
+    public Map<Integer, Pair<Integer, List<Integer>>> getBarrierTable() {
+        return barrierTable;
+    }
+    public Map<Integer, Pair<Integer, List<Integer>>> getSemaphoreTable() {
+        return semaphoreTable;
     }
 
     public void setFunctionFinished(boolean finished) {
@@ -120,12 +141,34 @@ public class ProgramState extends Observable {
         }
         if (top != null) {
             ProgramState ret = top.execute(this);
-            // notify the repo
+            // notify the repo ON THE UI THREAD!
+            // notifying on this thread (one from the Executor) will cause an illegal state exception because UI
+            // elements will be updated from a thread other than the FX thread
             Platform.runLater(this::notifyObservers);
             return ret;
         }
 
         else
             return null;
+    }
+
+    public Integer getNewLatchAddress() {
+        latchCount++;
+        return latchCount;
+    }
+
+    public int getNewBarrierAddress() {
+        barrierCount++;
+        return barrierCount;
+    }
+
+    public int getNewSemaphoreAddress() {
+        semaphoreCount++;
+        return semaphoreCount;
+    }
+
+    public int getNewLockAddress() {
+        lockCount++;
+        return lockCount;
     }
 }
