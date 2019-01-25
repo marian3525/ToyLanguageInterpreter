@@ -3,110 +3,67 @@ package model.statement;
 import exceptions.SyntaxException;
 import exceptions.UndefinedOperationException;
 import exceptions.UndefinedVariableException;
+import javafx.util.Pair;
 import model.expression.AbstractExpression;
+import model.interfaces.ProcTableInterface;
 import model.programState.ProgramState;
-import org.intellij.lang.annotations.RegExp;
-import parsers.StatementParser;
 
 import java.io.IOException;
-import java.util.Vector;
+import java.util.HashMap;
+import java.util.List;
 
 public class CallStatement extends AbstractStatement {
-    @RegExp
-    private static final String callStatementRegex = "";
 
-    private String functionName;
-    private Vector<AbstractExpression> args;
-    private String returnVar;
+    private String fname;
+    private List<AbstractExpression> args;
 
-    public CallStatement(String functionName, Vector<AbstractExpression> arguments) {
-        this.functionName = functionName;
-        this.args = arguments;
-        returnVar = "";
-    }
-
-    public CallStatement(String functionName, Vector<AbstractExpression> arguments, String returnVarName) {
-        this.functionName = functionName;
-        this.args = arguments;
-        returnVar = returnVarName;
-    }
-
-    /**
-     * Call syntax: call <functionName>(arg1, arg2..., argn)
-     *
-     * @param input: statement string
-     * @return the CallStatement built from the string
-     */
-    public static CallStatement getCallStatementFromString(String input) throws SyntaxException {
-        //remove the 'call' and extract the function name and params
-        String functionName;
-        String[] args;
-        CallStatement statement = null;
-        input = input.replace("call ", "");
-        functionName = input.split("\\(")[0];
-        args = input.split("\\(")[1].replace(")", "").replace(" ", "")
-                .split(",");
-        Vector<AbstractStatement> params = new Vector<>();
-        for (String arg : args) {
-            statement = (CallStatement) StatementParser.getStatementFromString(arg);
-        }
-        return statement;
+    public CallStatement(String fname, List<AbstractExpression> args) {
+        this.fname = fname;
+        this.args = args;
     }
 
     @Override
     public String toString() {
-        return "Call: " + functionName + args.toString();
+        return "call " + fname + "(" + args + ")";
     }
 
-    /**
-     * Load the statements of the function on the stack and then call execute on the function
-     * Call setReturn(varName) if the return value of the function need to be stored
-     * After the function returns, clear the stack of the remaining statements from the prev. called function
-     * This situation will occur when the function returns before executing all statements in its body
-     *
-     * @param programState the current program state
-     * @return the modified program state
-     * @throws UndefinedOperationException
-     * @throws UndefinedVariableException
-     * @throws IOException
-     */
     @Override
     public ProgramState execute(ProgramState programState) throws UndefinedOperationException, UndefinedVariableException, IOException, SyntaxException {
-        /*
-        Function f = (Function) programState.getFunctions().get(functionName);
-        Stack<AbstractStatement> stack = programState.getExecutionStack();
-        //load into the execution stack
-        Vector<AbstractStatement> statements = f.getStatements();
-        //prepare for the stack push in reverse order
-        Collections.reverse(statements);
 
-        for (AbstractStatement statement : statements)
-            programState.getExecutionStack().push(statement);
+        ProcTableInterface procs = programState.getProcTable();
+        Pair<List<String>, AbstractStatement> procedure = procs.get(fname);
+        if(procedure == null) {
+            throw new UndefinedOperationException("Procedure " + fname + " not defined");
+        }
+        List<String> formals = procedure.getKey();
+        AbstractStatement body = procedure.getValue();
 
-        //set the return var name, if any
-        if (returnVar.length() > 0) {
-            if (programState.getSymbols().get(returnVar) != null)
-                f.setReturnVar(returnVar);
+        HashMap<String, Integer> procSymbols = new HashMap<>();
+
+        // map the formal param to their actual values
+        for(int idx=0; idx < args.size(); idx++) {
+            procSymbols.put(formals.get(idx), args.get(idx).evaluate(programState.getSymbols(), programState.getHeap()));
         }
 
-        //call the function and clear the stack of its remaining statements after returning, if any
-        f.execute(programState);
+        // push the new symbols onto the symbols stack
+        programState.getSymbolsStack().push(procSymbols);
 
-        while (!stack.isEmpty() && stack.peek().getFunction().equals(functionName)) {
-            stack.pop();
-        }
-        */
+        // push the return statement
+        programState.getExecutionStack().push(new ReturnStatement());
+
+        // push the body of the function on the top of the execution stack
+        programState.getExecutionStack().push(body);
+
         return null;
     }
 
     @Override
     public String getFunction() {
-        return functionName;
+        return null;
     }
 
     @Override
     public void setFunction(String functionName) {
-        this.functionName = functionName;
     }
 
     /**
@@ -116,6 +73,6 @@ public class CallStatement extends AbstractStatement {
      *          false if the string doesn't match the class
      */
     public static boolean matchesString(String statementString) {
-        return statementString.matches(callStatementRegex);
+        return false;//statementString.matches(callStatementRegex);
     }
 }

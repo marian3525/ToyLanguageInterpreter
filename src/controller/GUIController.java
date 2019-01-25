@@ -6,16 +6,14 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import model.adt.Pair;
+import javafx.util.Pair;
+import model.statement.AbstractStatement;
 import model.util.FileTable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GUIController implements Initializable, model.util.Observer {
@@ -47,6 +45,8 @@ public class GUIController implements Initializable, model.util.Observer {
     private Button runButton;
     @FXML
     private Button stepButton;
+    @FXML
+    private TableView<Map.Entry<String, Pair<List<String>, AbstractStatement>>> procTable;
 
     // execution flags, modified through commands starting with '!'
     private String currentProg = "main";
@@ -92,6 +92,7 @@ public class GUIController implements Initializable, model.util.Observer {
         executionList.setEditable(false);
         outputList.setEditable(false);
         progStatesList.setEditable(false);
+        procTable.setEditable(false);
 
         // configure the buttons
         runButton.setOnAction(event -> runProgram(currentProg, false));
@@ -131,6 +132,8 @@ public class GUIController implements Initializable, model.util.Observer {
         TableColumn<Map.Entry<String, Integer>, Integer> varValueColumn = new TableColumn("Value ");
         varValueColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue()));
 
+        symbolTable.getColumns().addAll(variableNameColumn, varValueColumn);
+
         /*
         TableColumn<type given in the update> col1 = new TableColumn("col1Name");
         col1.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getWhateverPartOfParamYouWantForThisColumn)
@@ -139,7 +142,16 @@ public class GUIController implements Initializable, model.util.Observer {
          dummyTable.getColumns().addAll(col1, col2);
          */
 
-        symbolTable.getColumns().addAll(variableNameColumn, varValueColumn);
+
+        // procedure table
+        TableColumn<Map.Entry<String, Pair<List<String>, AbstractStatement>>, String> nameColumn = new TableColumn("Procedure");
+        nameColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getKey() + param.getValue().getValue().getKey()));
+
+        TableColumn<Map.Entry<String, Pair<List<String>, AbstractStatement>>, String> bodyColumn = new TableColumn("Body");
+        bodyColumn.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue().getValue().getValue().toString()));
+
+        procTable.getColumns().addAll(nameColumn, bodyColumn);
+        // TODO add update
     }
 
     private void log(String message) {
@@ -168,6 +180,7 @@ public class GUIController implements Initializable, model.util.Observer {
         Vector<String> stack;
         Map<String, Integer> symbols;
         Vector<String> output;
+        Map<String, Pair<List<String>, AbstractStatement>> procedures;
         // attempt to get updated values
         try {
             heap = executionController.getHeap(progName).getAll();
@@ -175,6 +188,8 @@ public class GUIController implements Initializable, model.util.Observer {
             stack = executionController.getStackString(progName);
             symbols = executionController.getSymbols(progName);
             output = executionController.getOutput(progName);
+            procedures = executionController.getProcedures(progName).getAll();
+
         } catch (RepositoryException e) {
             log(e.getMessage());
             return;
@@ -195,8 +210,8 @@ public class GUIController implements Initializable, model.util.Observer {
         outputList.setItems(FXCollections.observableArrayList(output));
         outputList.refresh();
 
-        // dummy table
-
+        procTable.setItems(FXCollections.observableArrayList(procedures.entrySet()));
+        procTable.refresh();
 
         updateProgramLists();
     }

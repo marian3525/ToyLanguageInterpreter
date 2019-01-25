@@ -93,5 +93,9 @@
             <Font size="15.0" />
          </font>
       </Label>
+      <TableView fx:id="procTable" layoutX="645.0" layoutY="584.0" prefHeight="200.0" prefWidth="363.0">
+        <columns>
+        </columns>
+      </TableView>
     </children>
 </Pane>

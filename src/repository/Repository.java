@@ -1,6 +1,7 @@
 package repository;
 
 import exceptions.RepositoryException;
+import javafx.util.Pair;
 import model.programState.ProgramState;
 import model.statement.AbstractStatement;
 import model.util.Observable;
@@ -38,6 +39,11 @@ public class Repository extends Observable implements RepositoryInterface, Obser
             programState.registerObserver(this);
             notifyObservers();
         }
+    }
+
+    @Override
+    public void addProcedure(String name, Pair<List<String>, AbstractStatement> proc, String progName) {
+        progs.get(progName).getProcTable().put(name, proc);
     }
 
     public ProgramState getProgramByName(String progName) throws RepositoryException {

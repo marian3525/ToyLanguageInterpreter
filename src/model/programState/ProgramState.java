@@ -8,7 +8,9 @@ import exceptions.UndefinedVariableException;
 import javafx.application.Platform;
 import javafx.util.Pair;
 import model.adt.Heap;
+import model.adt.ProcTable;
 import model.interfaces.HeapInterface;
+import model.interfaces.ProcTableInterface;
 import model.statement.AbstractStatement;
 import model.util.FileTable;
 import model.util.Observable;
@@ -19,7 +21,9 @@ import java.util.*;
 
 public class ProgramState extends Observable {
     private Stack<AbstractStatement> executionStack;
-    private Map<String, Integer> symbols;
+    private Stack<HashMap<String, Integer>> symbols;
+    private ProcTableInterface procTable;
+
     private Vector<String> output;
     private FileTable files;
     private HeapInterface heap;
@@ -33,15 +37,18 @@ public class ProgramState extends Observable {
     private static int semaphoreCount = 0;
     private static int lockCount = 0;
     private int id;
-    private int lastReturn;
-    private boolean functionFinished;
 
     public ProgramState() {
         // init the Observable
         super();
 
         executionStack = new Stack<>();
-        symbols = new HashMap<>();
+
+        symbols = new Stack<>();
+        symbols.push(new HashMap<>());
+
+        procTable = new ProcTable();
+
         output = new Vector<>(10);
         files = new FileTable();
         heap = new Heap();
@@ -63,10 +70,11 @@ public class ProgramState extends Observable {
         super();
 
         executionStack = new Stack<>();
-        symbols = new HashMap<>();
+        symbols = new Stack<>();
+        symbols.push(new HashMap<>());
 
-        // copy
-        source.symbols.forEach(symbols::put);
+        // copy symbols
+        source.symbols.peek().forEach(symbols.peek()::put);
 
         // reference
         output = source.output;
@@ -79,7 +87,14 @@ public class ProgramState extends Observable {
         lockTable = source.lockTable;
         barrierTable = source.barrierTable;
         semaphoreTable=source.semaphoreTable;
+
+        procTable=source.procTable;
+
         progCount++;
+    }
+
+    public ProcTableInterface getProcTable() {
+        return procTable;
     }
 
 
@@ -88,6 +103,10 @@ public class ProgramState extends Observable {
     }
 
     public Map<String, Integer> getSymbols() {
+        return symbols.peek();
+    }
+
+    public Stack<HashMap<String, Integer>> getSymbolsStack() {
         return symbols;
     }
 
@@ -119,7 +138,6 @@ public class ProgramState extends Observable {
     }
 
     public void setFunctionFinished(boolean finished) {
-        this.functionFinished = finished;
         notifyObservers();
     }
 

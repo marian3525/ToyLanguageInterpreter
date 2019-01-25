@@ -1,17 +1,14 @@
 package controller;
 
 import exceptions.*;
+import javafx.util.Pair;
 import model.adt.Heap;
-import model.adt.Pair;
+import model.expression.ArithmeticExpression;
 import model.expression.ConstantExpression;
+import model.expression.VariableExpression;
+import model.interfaces.ProcTableInterface;
 import model.programState.ProgramState;
-import model.statement.AbstractStatement;
-import model.statement.CompoundStatement;
-import model.statement.ForkStatement;
-import model.statement.Lock.LockStatement;
-import model.statement.Lock.NewLockStatement;
-import model.statement.Lock.UnlockStatement;
-import model.statement.PrintStatement;
+import model.statement.*;
 import model.util.FileTable;
 import model.util.Observer;
 import org.jetbrains.annotations.NotNull;
@@ -108,6 +105,7 @@ public class ExecutionController {
                 .map((ProgramState programState) -> (Callable<ProgramState>) (programState::step))
                 .collect(Collectors.toList());
 
+
         //start the execution of the callables, returns a new list of progStates, threads
         try {
             List<ProgramState> newStates = executorService.invokeAll(callList).stream()
@@ -126,9 +124,11 @@ public class ExecutionController {
             for (ProgramState p : newStates) {
                 programs.put(String.valueOf(p.getId()), p);
             }
-            repo.setPrograms(removeCompleted(programs));
-            //log the state
             newStates.forEach(progState -> repo.logProgramState(progState));
+
+            repo.setPrograms(removeCompleted(programs));
+
+            //log the state
         } catch(RejectedExecutionException ree) {
             System.out.println("Execution rejected by the Executor, no program states to run");
         }
@@ -147,7 +147,6 @@ public class ExecutionController {
             //gc for all the current programStates
             progStates.forEach((name, state) ->
                     state.getHeap().setContent(gc(state.getSymbols().values(), state.getHeap().getContent())));
-
             stepOnAll(new ArrayList<>(progStates.keySet()));
 
             progStates.forEach((str, state) -> repo.logProgramState(state));
@@ -245,7 +244,7 @@ public class ExecutionController {
         for (String progName : inMap.keySet()) {
             try {
                 // close the files on progStates that completed execution and remove it from the map
-                if (!repo.getProgramByName(progName).isNotCompleted() || progName.equals("main")) {
+                if (!repo.getProgramByName(progName).isNotCompleted()) {
                     closeFiles(progName);
                 }
             } catch (RepositoryException e) {
@@ -257,7 +256,8 @@ public class ExecutionController {
                 .filter(program -> {
                     boolean finished = !program.getValue().isNotCompleted();
                     if(finished) {repo.logProgramState(program.getValue());
-                    return false;
+                    // false
+                    return true;
                     }
                     else {
                         return true;
@@ -287,7 +287,9 @@ public class ExecutionController {
          * exists
          */
         // add program states with the statements given as strings
+
         try {
+            /*
             addEmptyProgram("example1");
             addStatementString("print(a)", "example1");
             addStatementString("closeFile(1)", "example1");
@@ -309,26 +311,85 @@ public class ExecutionController {
 
             addEmptyProgram("simple");
             addStatementString("print(0)", "simple");
-
+*/
             // add program states the ugly way
-            repo.addProgram("test", new ProgramState());
-            AbstractStatement statement = new CompoundStatement(new PrintStatement(new ConstantExpression(0)),
-                    new PrintStatement(new ConstantExpression(1)));
-            repo.getProgramByName("test").getExecutionStack().push(statement);
+            repo.addProgram("exam1", new ProgramState());
 
+            AbstractStatement first = new AssignmentStatement("v", new ConstantExpression(10));
 
-            repo.addProgram("test1", new ProgramState());
-            AbstractStatement statement1 = new CompoundStatement(
-                    new NewLockStatement("a"), new CompoundStatement(
-                            new LockStatement("a"), new CompoundStatement(
-                                    new ForkStatement(new PrintStatement(new ConstantExpression(1))),
-                                    new CompoundStatement(new PrintStatement(new ConstantExpression(0)), new UnlockStatement("a")))
-            )
+            AbstractStatement insideFork = new CompoundStatement(
+                    new AssignmentStatement("v", new ArithmeticExpression(new VariableExpression("v"), new ConstantExpression(1), "-")),
+                    new CompoundStatement(
+                            new AssignmentStatement("v", new ArithmeticExpression(new VariableExpression("v"), new ConstantExpression(1), "-")),
+                            new PrintStatement(new VariableExpression("v"))
+                            )
             );
-            repo.getProgramByName("test1").getExecutionStack().push(statement1);
-        }
-        catch(SyntaxException | RepositoryException ignored) {
+
+            AbstractStatement lastStatements = new CompoundStatement(new SleepStatement(10), new PrintStatement(
+                    new ArithmeticExpression(new VariableExpression("v"), new ConstantExpression(10), "*")
+            ));
+
+            AbstractStatement fStatement = new ForkStatement(insideFork);
+            AbstractStatement last = new CompoundStatement(fStatement, lastStatements);
+
+            repo.getProgramByName("exam1").getExecutionStack().push(last);
+            repo.getProgramByName("exam1").getExecutionStack().push(first);
+
+
+            // add procedures
+
+            // add main
+            repo.addProgram("exam2", new ProgramState());
+
+            String name = "sum";
+            List<String> formals = Arrays.asList("a", "b");
+            AbstractStatement body = new CompoundStatement(new AssignmentStatement("v",
+                    new ArithmeticExpression(new VariableExpression("a"),
+                                                new VariableExpression("b"),
+                                                                        "+")), new PrintStatement(new VariableExpression("v")));
+            repo.addProcedure(name, new Pair<>(formals, body), "exam2");
+
+            name = "product";
+            formals = Arrays.asList("a", "b");
+            body = new CompoundStatement(
+                    new AssignmentStatement("v",
+                                new ArithmeticExpression(new VariableExpression("a"),
+                                            new VariableExpression("b"),
+                                        "*")),
+                    new PrintStatement(new VariableExpression("v")));
+            repo.addProcedure(name, new Pair<>(formals, body), "exam2");
+
+
+            AbstractStatement second = new ForkStatement(
+                    new CompoundStatement(
+                            new CallStatement("product", Arrays.asList(new VariableExpression("v"), new VariableExpression("w"))),
+                            new ForkStatement(
+                               new CallStatement("sum", Arrays.asList(new VariableExpression("v"), new VariableExpression("w")))
+                            )
+                            ));
+
+            AbstractStatement one = new CompoundStatement(
+                    new AssignmentStatement("v", new ConstantExpression(2)),
+                    new AssignmentStatement("w", new ConstantExpression(5))
+            );
+
+            AbstractStatement two = new CompoundStatement(
+                    new CallStatement("sum", Arrays.asList(new ArithmeticExpression(new VariableExpression("v"), new ConstantExpression(10), "*"), new VariableExpression("w"))),
+                    new PrintStatement(new VariableExpression("v"))
+            );
+
+            repo.getProgramByName("exam2").getExecutionStack().push(second);
+            repo.getProgramByName("exam2").getExecutionStack().push(two);
+            repo.getProgramByName("exam2").getExecutionStack().push(one);
+
 
         }
+        catch(RepositoryException ignored) {
+
+        }
+    }
+
+    public ProcTableInterface getProcedures(String progName) throws RepositoryException{
+        return repo.getProgramByName(progName).getProcTable();
     }
 }
